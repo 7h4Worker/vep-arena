@@ -1,3 +1,7 @@
+# Author: Liu Haifeng <liuhf@728@gmail.com>
+# Created: 2026-06-17
+# Last updated: 2026-06-17
+# Description: Part of the VEP Arena SSVEP benchmark workspace.
 from __future__ import annotations
 
 import argparse
@@ -76,7 +80,7 @@ def main() -> None:
     parser.add_argument("--subjects", default="1-35")
     parser.add_argument("--blocks", default="1-6")
     parser.add_argument("--windows", default="0.5,1.0")
-    parser.add_argument("--methods", default="MVMD-CCA,SA-MVMD-TRCA")
+    parser.add_argument("--methods", default="MVMD-CCA,MVMD-TRCA,SA-MVMD-TRCA")
     parser.add_argument("--harmonics", type=int, default=5)
     parser.add_argument("--assist-harmonics", type=int, default=2)
     parser.add_argument("--n-modes", type=int, default=5)
@@ -98,7 +102,7 @@ def main() -> None:
     manifest: dict[str, object] = {
         "methods": methods,
         "dataset": "Benchmark",
-        "protocol": "subject-specific leave-one-block-out for SA-MVMD-TRCA; calibration-free for MVMD-CCA",
+        "protocol": "subject-specific leave-one-block-out for MVMD-TRCA/SA-MVMD-TRCA; calibration-free for MVMD-CCA",
         "subjects": subjects,
         "blocks": blocks,
         "windows": windows,
@@ -112,7 +116,8 @@ def main() -> None:
         "reference_code": "D:/ProjData/_reference/MDApproach_PS/MVMD.m",
         "notes": [
             "MVMD-CCA is an Arena implementation of the MVMD + CCA decoding line.",
-            "SA-MVMD-TRCA is an efficient local reproduction style: all Benchmark sine/cosine references are appended once as sinusoidal assistance, then TRCA is trained on reconstructed EEG.",
+            "MVMD-TRCA decomposes each trial with MVMD, reconstructs EEG modes, then trains ordinary TRCA.",
+            "SA-MVMD-TRCA is an efficient local reproduction style: all Benchmark sine/cosine references are appended once as sinusoidal assistance, then ordinary TRCA is trained on reconstructed EEG.",
             "This is not official author code; use as a controlled local reproduction until paper code/settings are obtained.",
         ],
     }
@@ -135,6 +140,22 @@ def main() -> None:
         )
         for subject in subjects:
             data = load_subject_trials(args.data_root, subject, window, spec=spec)
+            mvmd_trca_data = None
+            if "MVMD-TRCA" in methods:
+                t0 = time.perf_counter()
+                mvmd_trca_data = transform_subject(
+                    data,
+                    refs=None,
+                    alpha=args.alpha,
+                    n_modes=args.n_modes,
+                    max_iter=args.max_iter,
+                    tol=args.tol,
+                    drop_first=args.drop_first_mode,
+                )
+                print(
+                    f"mvmd-transform window={window:.1f} subject={subject:02d} seconds={time.perf_counter() - t0:.2f}",
+                    flush=True,
+                )
             sa_data = None
             if "SA-MVMD-TRCA" in methods:
                 t0 = time.perf_counter()
@@ -192,12 +213,53 @@ def main() -> None:
                         flush=True,
                     )
 
+                if mvmd_trca_data is not None:
+                    train_blocks = [idx for idx in range(spec.blocks) if idx != block_idx]
+                    train_x = mvmd_trca_data[:, train_blocks]
+                    test_x = mvmd_trca_data[:, block_idx]
+                    t0 = time.perf_counter()
+                    model = SimpleTRCA.fit(train_x, ensemble=False)
+                    pred, scores = model.predict(test_x)
+                    seconds = time.perf_counter() - t0
+                    acc = accuracy_score(test_y, pred)
+                    itr = itr_bits_per_minute(float(acc), spec.classes, window + spec.cue_seconds)
+                    subject_block_rows.append(
+                        {
+                            "method": "MVMD-TRCA",
+                            "window": window,
+                            "subject": subject,
+                            "block": block,
+                            "accuracy": float(acc),
+                            "itr": float(itr),
+                            "samples": spec.classes,
+                            "seconds": seconds,
+                        }
+                    )
+                    for true_label, pred_label in zip(test_y, pred):
+                        prediction_rows.append(
+                            {
+                                "method": "MVMD-TRCA",
+                                "window": window,
+                                "subject": subject,
+                                "block": block,
+                                "true": int(true_label),
+                                "pred": int(pred_label),
+                                "score_true": float(scores[int(true_label), int(true_label)]),
+                                "score_pred": float(scores[int(true_label), int(pred_label)]),
+                            }
+                        )
+                    print(
+                        f"mvmd-trca window={window:.1f} subject={subject:02d} block={block} "
+                        f"acc={acc:.3f} seconds={seconds:.2f}",
+                        flush=True,
+                    )
+
                 if sa_data is not None:
                     train_blocks = [idx for idx in range(spec.blocks) if idx != block_idx]
                     train_x = sa_data[:, train_blocks]
                     test_x = sa_data[:, block_idx]
                     t0 = time.perf_counter()
-                    model = SimpleTRCA.fit(train_x, ensemble=True)
+                    model = SimpleTRCA.fit(train_x, ensemble=False)
                     pred, scores = model.predict(test_x)
                     seconds = time.perf_counter() - t0
                     acc = accuracy_score(test_y, pred)

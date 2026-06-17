@@ -155,25 +155,16 @@ Success check:
 - The same TDCA smoke test can be run from JSON and from the old CLI with
   matching `summary.csv` values.
 
-### Task 2: TDCA Ensemble Investigation
+### Task 2: Keep TDCA as Standard TDCA
 
-TRCA has a clear ensemble variant (`ETRCA`). TDCA is currently implemented as
-the standard method from Liu et al. 2021, with filter-bank weighting and
-temporal-delay augmentation. Public summaries describe TDCA as outperforming
-ensemble TRCA, not necessarily as defining a standard "ensemble TDCA" baseline.
+TRCA has a clear ensemble variant (`ETRCA`). TDCA is implemented as the
+standard method from Liu et al. 2021, with filter-bank weighting and
+temporal-delay augmentation. Do not add a TDCA ensemble variant unless a later
+source-backed protocol specifically requires it.
 
-Before adding `ETDCA`, verify one of the following:
+Deliverable:
 
-- the original TDCA paper defines an ensemble TDCA variant;
-- SSVEP-Analysis-Toolbox or another trusted implementation exposes a named
-  eTDCA/ensemble-TDCA method;
-- a later paper defines a reproducible ensemble TDCA protocol worth including.
-
-Deliverables if verified:
-
-- `TDCA(ensemble=True)` or a separate adapter with source-linked notes.
-- Smoke test against standard TDCA.
-- Full 0.2-2.0 s run only after the smoke test passes.
+- Keep TDCA manifests and reports named as standard `TDCA`.
 
 ### Task 3: SA-MVMD-TRCA and SA-MVMD-ETRCA
 
@@ -274,7 +265,7 @@ name. That makes old result folders interpretable even after config files evolve
 
 1. Add task JSON runner and validation.
 2. Add stress-test command path.
-3. Verify TDCA ensemble/eTDCA from paper or toolbox.
+3. Keep TDCA as standard TDCA; do not schedule ensemble TDCA.
 4. Add SA-MVMD-TRCA smoke task.
 5. Add SA-MVMD-ETRCA smoke task if supported.
 6. Import existing DNN clean results into Arena schema.
@@ -317,4 +308,3 @@ A method is considered integrated into VEP Arena only when:
 - optional heavy artifacts are disabled by default;
 - runtime is captured in `runtime.csv`;
 - source code is committed and generated artifacts are ignored.
-
