@@ -20,6 +20,8 @@ from vep_arena.config import DATA_ROOT, RUN_ROOT, WINDOWS, BenchmarkSpec
 from vep_arena.data.benchmark import load_subject_trials
 from vep_arena.metrics import itr_bits_per_minute
 from vep_arena.methods.mvmd import MVMDCCAClassifier, SimpleTRCA, mvmd_reconstruct_trial, reference_bank
+from vep_arena.methods.mvmd import mvmd
+from vep_arena.methods.traditional import TRCA
 
 
 def parse_range(text: str) -> list[int]:
@@ -73,6 +75,41 @@ def transform_subject(
     return out
 
 
+def decompose_subject_modes(
+    data: np.ndarray,
+    *,
+    alpha: float,
+    n_modes: int,
+    max_iter: int,
+    tol: float,
+) -> np.ndarray:
+    """Return classes x blocks x modes x channels x samples."""
+
+    classes, blocks, channels, samples = data.shape
+    out = np.zeros((classes, blocks, n_modes, channels, samples), dtype=np.float32)
+    for target in range(classes):
+        for block in range(blocks):
+            modes, _ = mvmd(
+                data[target, block],
+                alpha=alpha,
+                n_modes=n_modes,
+                init=1,
+                max_iter=max_iter,
+                tol=tol,
+            )
+            out[target, block] = modes.astype(np.float32)
+    return out
+
+
+def fit_mode_trca(train_x: np.ndarray, *, ensemble: bool = False) -> TRCA:
+    """Fit TRCA on classes x train_blocks x modes x channels x samples."""
+
+    classes, train_blocks, modes, channels, samples = train_x.shape
+    x = train_x.reshape(classes * train_blocks, modes, channels, samples)
+    y = np.repeat(np.arange(classes, dtype=np.int64), train_blocks)
+    return TRCA(n_fbs=modes, ensemble=ensemble).fit(x, y)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-root", type=Path, default=DATA_ROOT)
@@ -80,7 +117,7 @@ def main() -> None:
     parser.add_argument("--subjects", default="1-35")
     parser.add_argument("--blocks", default="1-6")
     parser.add_argument("--windows", default="0.5,1.0")
-    parser.add_argument("--methods", default="MVMD-CCA,MVMD-TRCA,SA-MVMD-TRCA")
+    parser.add_argument("--methods", default="MVMD-CCA")
     parser.add_argument("--harmonics", type=int, default=5)
     parser.add_argument("--assist-harmonics", type=int, default=2)
     parser.add_argument("--n-modes", type=int, default=5)
@@ -116,9 +153,9 @@ def main() -> None:
         "reference_code": "D:/ProjData/_reference/MDApproach_PS/MVMD.m",
         "notes": [
             "MVMD-CCA is an Arena implementation of the MVMD + CCA decoding line.",
-            "MVMD-TRCA decomposes each trial with MVMD, reconstructs EEG modes, then trains ordinary TRCA.",
+            "MVMD-TRCA is an exploratory diagnostic only; it decomposes raw epochs with MVMD, treats modes as filter-bank subbands, then trains ordinary TRCA.",
             "SA-MVMD-TRCA is an efficient local reproduction style: all Benchmark sine/cosine references are appended once as sinusoidal assistance, then ordinary TRCA is trained on reconstructed EEG.",
-            "This is not official author code; use as a controlled local reproduction until paper code/settings are obtained.",
+            "This runner is not the paper-style SA-MVMD reproduction path. Use scripts/run_sa_mvmd_paper.py for source-aligned SA-MVMD-TRCA checks.",
         ],
     }
     started = time.perf_counter()
@@ -143,14 +180,12 @@ def main() -> None:
             mvmd_trca_data = None
             if "MVMD-TRCA" in methods:
                 t0 = time.perf_counter()
-                mvmd_trca_data = transform_subject(
+                mvmd_trca_data = decompose_subject_modes(
                     data,
-                    refs=None,
                     alpha=args.alpha,
                     n_modes=args.n_modes,
                     max_iter=args.max_iter,
                     tol=args.tol,
-                    drop_first=args.drop_first_mode,
                 )
                 print(
                     f"mvmd-transform window={window:.1f} subject={subject:02d} seconds={time.perf_counter() - t0:.2f}",
@@ -218,7 +253,7 @@ def main() -> None:
                     train_x = mvmd_trca_data[:, train_blocks]
                     test_x = mvmd_trca_data[:, block_idx]
                     t0 = time.perf_counter()
-                    model = SimpleTRCA.fit(train_x, ensemble=False)
+                    model = fit_mode_trca(train_x, ensemble=False)
                     pred, scores = model.predict(test_x)
                     seconds = time.perf_counter() - t0
                     acc = accuracy_score(test_y, pred)
