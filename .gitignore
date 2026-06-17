@@ -20,6 +20,8 @@ runs/
 /data/
 /datasets/
 docs/papers/
+docs/paper_notes/**/full_text.txt
+docs/paper_notes/**/page_*.txt
 *.mat
 *.npz
 *.npy
