@@ -1,0 +1,23 @@
+{
+  "method": "TRCA-Net",
+  "dataset": "Tsinghua Benchmark SSVEP",
+  "channels": [48, 54, 55, 56, 57, 58, 61, 62, 63],
+  "subjects": "1-35",
+  "blocks": "1-6",
+  "windows": [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+  "protocol": "subject-specific leave-one-block-out",
+  "trca_subbands": 3,
+  "cnn_subbands": 3,
+  "classes": 40,
+  "sampling_rate": 250,
+  "cue_seconds": 0.5,
+  "latency_seconds": 0.14,
+  "global_epochs": 500,
+  "finetune_epochs": 1000,
+  "batch_size": 100,
+  "lr": 0.0001,
+  "weight_decay": 0.001,
+  "dropout_global": 0.1,
+  "dropout_finetune": 0.6,
+  "dropout_final": 0.95
+}

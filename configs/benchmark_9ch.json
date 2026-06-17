@@ -1,0 +1,12 @@
+{
+  "dataset": "Tsinghua Benchmark SSVEP",
+  "channels": [48, 54, 55, 56, 57, 58, 61, 62, 63],
+  "subjects": "1-35",
+  "blocks": "1-6",
+  "windows": [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+  "protocol": "subject-specific leave-one-block-out",
+  "classes": 40,
+  "sampling_rate": 250,
+  "cue_seconds": 0.5,
+  "latency_seconds": 0.14
+}

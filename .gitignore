@@ -1,0 +1,43 @@
+# Environments and local tooling
+.venv/
+*.egg-info/
+.env
+.env.*
+
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Arena generated artifacts
+results/
+runs/
+成果汇总/
+
+# Large/raw data and binary documents kept outside source control
+/data/
+/datasets/
+docs/papers/
+*.mat
+*.npz
+*.npy
+*.h5
+*.hdf5
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.pkl
+*.joblib
+*.pdf
+*.pptx
+*.docx
+*.xlsx
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
