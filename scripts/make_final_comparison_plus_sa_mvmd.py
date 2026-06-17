@@ -18,6 +18,7 @@ OUT = BASE / "final_compare_plus_sa_mvmd"
 
 BASE_SUMMARY = BASE / "final_compare" / "summary.csv"
 SA_SUMMARY = BASE / "sa_mvmd_paper" / "summary.csv"
+DNN_SUMMARY = BASE / "dnn_import_existing" / "summary.csv"
 
 METHOD_ORDER = [
     "CCA",
@@ -81,6 +82,10 @@ def normalize_summary(df: pd.DataFrame) -> pd.DataFrame:
 
 def load_summary() -> pd.DataFrame:
     base = normalize_summary(pd.read_csv(BASE_SUMMARY))
+    if DNN_SUMMARY.exists():
+        dnn = normalize_summary(pd.read_csv(DNN_SUMMARY))
+        base = base[~base["method"].eq("DNN")].copy()
+        base = pd.concat([base, dnn[dnn["method"].eq("DNN")]], ignore_index=True)
     sa = normalize_summary(pd.read_csv(SA_SUMMARY))
     summary = pd.concat([base, sa], ignore_index=True)
     summary["window"] = summary["window"].astype(float).round(1)
