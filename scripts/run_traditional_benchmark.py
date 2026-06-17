@@ -110,10 +110,22 @@ def load_epochs(
     store: CanonicalEpochStore,
 ) -> np.ndarray:
     preset = benchmark_9ch_default(args.data_root)
+    cache_window = getattr(args, "cache_window", window)
     if name == "CCA":
-        raw = store.load_or_create(EpochRequest(preset=preset, subject=subject, window=window, kind="raw"))
+        raw = store.load_or_create(
+            EpochRequest(preset=preset, subject=subject, window=window, kind="raw", cache_window=cache_window)
+        )
         return raw[:, :, None, :, :]
-    return store.load_or_create(EpochRequest(preset=preset, subject=subject, window=window, kind="filterbank", n_fbs=args.n_fbs))
+    return store.load_or_create(
+        EpochRequest(
+            preset=preset,
+            subject=subject,
+            window=window,
+            kind="filterbank",
+            n_fbs=args.n_fbs,
+            cache_window=cache_window,
+        )
+    )
 
 
 def write_outputs(
@@ -360,6 +372,7 @@ def run_subject_window_task(task: dict[str, object]) -> dict[str, object]:
     store = CanonicalEpochStore(epoch_cache)
     subject = int(task["subject"])
     window = float(task["window"])
+    cache_window = float(task["cache_window"])
     methods = [str(method) for method in task["methods"]]
     blocks = [int(block) for block in task["blocks"]]
     harmonics = int(task["harmonics"])
@@ -372,11 +385,18 @@ def run_subject_window_task(task: dict[str, object]) -> dict[str, object]:
     load_started = time.perf_counter()
     data_by_method: dict[str, np.ndarray] = {}
     if "CCA" in methods:
-        req = EpochRequest(preset=preset, subject=subject, window=window, kind="raw")
+        req = EpochRequest(preset=preset, subject=subject, window=window, kind="raw", cache_window=cache_window)
         raw = store.load_or_create(req, force=force_epochs)
         data_by_method["CCA"] = raw[:, :, None, :, :]
     if any(method in methods for method in ("FBCCA", "TRCA", "ETRCA")):
-        req = EpochRequest(preset=preset, subject=subject, window=window, kind="filterbank", n_fbs=n_fbs)
+        req = EpochRequest(
+            preset=preset,
+            subject=subject,
+            window=window,
+            kind="filterbank",
+            n_fbs=n_fbs,
+            cache_window=cache_window,
+        )
         filtered_epochs = store.load_or_create(req, force=force_epochs)
         for method in ("FBCCA", "TRCA", "ETRCA"):
             if method in methods:
@@ -470,7 +490,14 @@ def run_subject_window_task(task: dict[str, object]) -> dict[str, object]:
         ],
         "logs": logs,
         "epoch_fingerprint": epoch_fingerprint(
-            EpochRequest(preset=preset, subject=subject, window=window, kind="filterbank", n_fbs=n_fbs)
+            EpochRequest(
+                preset=preset,
+                subject=subject,
+                window=window,
+                kind="filterbank",
+                n_fbs=n_fbs,
+                cache_window=cache_window,
+            )
         ),
     }
 
@@ -499,6 +526,7 @@ def main() -> None:
     subjects = parse_range(args.subjects)
     blocks = parse_range(args.blocks)
     windows = parse_windows(args.windows)
+    cache_window = max(windows)
     methods = method_names(args.methods)
     result_dir = PROJECT_ROOT / "results" / args.task_name
     run_dir = RUN_ROOT / args.task_name
@@ -530,6 +558,8 @@ def main() -> None:
             "crop_start_seconds": preset.crop_start_seconds,
             "notch": "50 Hz iircomb Q=35",
             "filterbank": "SSVEP-Analysis-Toolbox Benchmark filterbank, 5 subbands by default",
+            "epoch_cache_policy": "subject_max_window_slice",
+            "epoch_cache_window": cache_window,
             "itr_trial_seconds": "window + 0.5 s gaze shift",
         },
     }
@@ -566,6 +596,7 @@ def main() -> None:
                 "result_dir": str(result_dir),
                 "subject": subject,
                 "window": window,
+                "cache_window": cache_window,
                 "methods": pending_methods,
                 "blocks": blocks,
                 "harmonics": args.harmonics,

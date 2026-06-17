@@ -138,6 +138,7 @@ def run_subject_window_task(task: dict[str, object]) -> dict[str, object]:
     store = CanonicalEpochStore(epoch_cache)
     subject = int(task["subject"])
     window = float(task["window"])
+    cache_window = float(task["cache_window"])
     blocks = [int(block) for block in task["blocks"]]
     n_fbs = int(task["n_fbs"])
     harmonics = int(task["harmonics"])
@@ -155,6 +156,7 @@ def run_subject_window_task(task: dict[str, object]) -> dict[str, object]:
         kind="filterbank",
         n_fbs=n_fbs,
         extra_samples=n_delay,
+        cache_window=cache_window,
     )
     epochs = store.load_or_create(req, force=force_epochs)
     refs = reference_signals(window, harmonics, spec)
@@ -275,6 +277,7 @@ def main() -> None:
     subjects = parse_range(args.subjects)
     blocks = parse_range(args.blocks)
     windows = parse_windows(args.windows)
+    cache_window = max(windows)
     result_dir = PROJECT_ROOT / "results" / args.task_name
     run_dir = RUN_ROOT / args.task_name
     result_dir.mkdir(parents=True, exist_ok=True)
@@ -310,6 +313,8 @@ def main() -> None:
             "notch": "50 Hz iircomb Q=35",
             "filterbank": "SSVEP-Analysis-Toolbox Benchmark filterbank, 5 subbands by default",
             "tdca_extra_samples": args.n_delay,
+            "epoch_cache_policy": "subject_max_window_slice",
+            "epoch_cache_window": cache_window,
             "itr_trial_seconds": "window + 0.5 s gaze shift",
         },
     }
@@ -341,6 +346,7 @@ def main() -> None:
                     kind="filterbank",
                     n_fbs=args.n_fbs,
                     extra_samples=args.n_delay,
+                    cache_window=cache_window,
                 )
                 store.load_or_create(req, force=args.force_epochs)
                 built += 1
@@ -361,6 +367,7 @@ def main() -> None:
                 "result_dir": str(result_dir),
                 "subject": subject,
                 "window": window,
+                "cache_window": cache_window,
                 "blocks": blocks,
                 "n_fbs": args.n_fbs,
                 "harmonics": args.harmonics,
