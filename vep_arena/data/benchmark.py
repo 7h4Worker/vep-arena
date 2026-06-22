@@ -150,12 +150,20 @@ def load_subject_toolbox_epochs(
     )
 
 
-def reference_signals(window: float, harmonics: int, spec: BenchmarkSpec | None = None) -> list[np.ndarray]:
+def reference_signals(
+    window: float,
+    harmonics: int,
+    spec: BenchmarkSpec | None = None,
+    frequencies: tuple[float, ...] | list[float] | None = None,
+    phases_pi: tuple[float, ...] | list[float] | None = None,
+) -> list[np.ndarray]:
     spec = spec or BenchmarkSpec()
+    frequencies = frequencies or BENCHMARK_FREQS
+    phases_pi = phases_pi or BENCHMARK_PHASES_PI
     samples = spec.sample_length(window)
     t = np.linspace(0, (samples - 1) / spec.sampling_rate, samples)[None, :]
     refs: list[np.ndarray] = []
-    for freq, phase_pi in zip(BENCHMARK_FREQS, BENCHMARK_PHASES_PI):
+    for freq, phase_pi in zip(frequencies, phases_pi):
         phase = phase_pi * np.pi
         rows = []
         for h in range(1, harmonics + 1):

@@ -43,8 +43,18 @@ def _cca_corr(x: np.ndarray, y_q: np.ndarray) -> float:
 class CCA:
     name = "CCA"
 
-    def __init__(self, window: float, harmonics: int = 5, spec: BenchmarkSpec | None = None) -> None:
-        self.refs_q = [_orth_rows(ref) for ref in reference_signals(window, harmonics, spec)]
+    def __init__(
+        self,
+        window: float,
+        harmonics: int = 5,
+        spec: BenchmarkSpec | None = None,
+        frequencies: tuple[float, ...] | list[float] | None = None,
+        phases_pi: tuple[float, ...] | list[float] | None = None,
+    ) -> None:
+        self.refs_q = [
+            _orth_rows(ref)
+            for ref in reference_signals(window, harmonics, spec, frequencies=frequencies, phases_pi=phases_pi)
+        ]
 
     def fit(self, train_x: np.ndarray, train_y: np.ndarray) -> "CCA":
         return self
@@ -73,8 +83,13 @@ class FBCCA:
         harmonics: int = 5,
         n_fbs: int = 5,
         spec: BenchmarkSpec | None = None,
+        frequencies: tuple[float, ...] | list[float] | None = None,
+        phases_pi: tuple[float, ...] | list[float] | None = None,
     ) -> None:
-        self.refs_q = [_orth_rows(ref) for ref in reference_signals(window, harmonics, spec)]
+        self.refs_q = [
+            _orth_rows(ref)
+            for ref in reference_signals(window, harmonics, spec, frequencies=frequencies, phases_pi=phases_pi)
+        ]
         self.weights = filterbank_weights(n_fbs)
 
     def fit(self, train_x: np.ndarray, train_y: np.ndarray) -> "FBCCA":
