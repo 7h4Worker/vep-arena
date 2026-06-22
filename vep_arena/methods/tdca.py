@@ -11,7 +11,11 @@ from scipy.linalg import eig, qr
 def _qr_projection(ref: np.ndarray) -> np.ndarray:
     centered = ref.T - np.mean(ref.T, axis=0, keepdims=True)
     q, _, _ = qr(centered, mode="economic", pivoting=True)
-    return q @ q.T
+    return q
+
+
+def _project_rows(x: np.ndarray, basis: np.ndarray) -> np.ndarray:
+    return (x @ basis) @ basis.T
 
 
 def _augment_delay_train(x: np.ndarray, samples: int, padding_len: int) -> np.ndarray:
@@ -100,7 +104,7 @@ class TDCA:
                 trials = []
                 for trial_idx in idx:
                     delayed = _augment_delay_train(x[trial_idx, fb], samples, self.padding_len)
-                    trials.append(np.concatenate([delayed, delayed @ self.projections[cls]], axis=1))
+                    trials.append(np.concatenate([delayed, _project_rows(delayed, self.projections[cls])], axis=1))
                 class_trials.append(trials)
                 class_mean = np.mean(np.stack(trials, axis=0), axis=0)
                 class_means.append(class_mean)
@@ -143,7 +147,7 @@ class TDCA:
                 base = self.filters[fb].T @ delayed
                 filt = self.filters[fb]
                 for cls in range(classes):
-                    projected = np.concatenate([base, base @ self.projections[cls]], axis=1)
+                    projected = np.concatenate([base, _project_rows(base, self.projections[cls])], axis=1)
                     all_scores[trial_idx, fb, cls] = _corrcoef_flat(projected, self.projected_templates[cls, fb])
             pred[trial_idx] = int(np.argmax(self.fb_weights @ all_scores[trial_idx]))
         return pred, all_scores
