@@ -304,6 +304,7 @@ def main() -> None:
     parser.add_argument("--dataset", choices=["beta", "wearable_wet", "wearable_dry"], required=True)
     parser.add_argument("--root", type=Path)
     parser.add_argument("--task-name")
+    parser.add_argument("--output-dir", type=Path)
     parser.add_argument("--subjects", default="1")
     parser.add_argument("--blocks")
     parser.add_argument("--targets")
@@ -329,7 +330,7 @@ def main() -> None:
     filter_window = max(windows)
     spec = spec_from_info(info)
     task_name = args.task_name or f"{args.dataset}_traditional_w{windows[0]:g}_{windows[-1]:g}s"
-    result_dir = PROJECT_ROOT / "results" / task_name
+    result_dir = args.output_dir or (PROJECT_ROOT / "results" / task_name)
     run_dir = RUN_ROOT / task_name
     result_dir.mkdir(parents=True, exist_ok=True)
     run_dir.mkdir(parents=True, exist_ok=True)

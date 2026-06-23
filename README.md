@@ -1,90 +1,107 @@
 # VEP Arena
 
-VEP Arena is a clean workspace for benchmarking visual evoked potential BCI
-methods. The first target is SSVEP recognition on the Tsinghua Benchmark
-dataset, using the already available DNN, SSVEPFormer, FBTRCA results and a new
-TDCA baseline.
+VEP Arena is a local-first Python workspace for visual evoked potential BCI
+experiments. The current focus is SSVEP benchmarking across Benchmark, BETA,
+and wearable datasets, with room for ERP, cVEP, RSVP, image-VEP, MNE QA, and
+online experiment backends.
 
-The project borrows high-level ideas from SSVEP-Analysis-Toolbox:
+The project intentionally keeps datasets and large generated artifacts outside
+source control. Code should stay small enough to read, while tasks own their
+specific results and plots.
 
-- dataset metadata should be explicit
-- preprocessing should be registered as a named pipeline
-- protocols should generate train/test splits
-- algorithms should expose a small fit/predict interface
-- evaluation should be centralized
-
-It does not copy the full toolbox structure. Neural networks need checkpoints,
-devices, seeds, training logs, and deployment hooks, so this project keeps the
-method interface smaller and leaves method-specific training details inside
-method adapters.
-
-## Main Ideas
+## Structure
 
 ```text
-dataset -> preprocess -> protocol -> method -> evaluator -> report
+vep_arena/
+  data/       dataset interfaces, presets, Benchmark and toolbox adapters
+  methods/    CCA, FBCCA, TRCA/ETRCA, TDCA, MVMD, TRCANet helpers
+  plots/      reusable plotting helpers
+  neuroviz/   MNE bridge and neuroscience-oriented views
+
+tasks/
+  beta_ssvep_9ch_baselines/
+  beta_ssvep_9ch_official_grid/
+
+scripts/
+  reusable command-line utilities and legacy-compatible entry points
+
+results/      legacy local outputs, ignored by git
+runs/         local caches, training outputs, and intermediate artifacts
 ```
 
-Clean outputs should stay short and human-readable:
+Task directories are the preferred place for new study logic:
 
 ```text
-results/
-  benchmark_9ch/
-    report.md
-    summary.csv
-    subject.csv
-    block.csv
-    stats.csv
-    tables/
-    figures/
+tasks/<dataset>_<scope>_<purpose>/
+  README.md
+  run.py
+  plot_acc_itr.py
+  results/
 ```
 
-Raw method outputs, logs, and checkpoints belong under `runs/`.
+`results/` under a task is ignored by default so large `predictions.csv`,
+runtime logs, and intermediate files are not committed accidentally. Compact
+CSV/PNG artifacts can be force-added when we explicitly want to publish them.
 
-## Current Methods
+## Data
 
-- DNN: imported from `D:/ProjData/proj_python/dnn_ssvep_pytorch`
-- SSVEPFormer: imported from `D:/ProjData/proj_python/ssvepformer_benchmark_pytorch`
-- FBTRCA: imported from `D:/ProjData/proj_python/fbtrca_benchmark_python`
-- TDCA: implemented as a first VEP Arena conventional-method adapter
-- TRCA-Net: staged for reproduction from `D:/ProjData/_reference/TRCA-Net`
-
-## Current Benchmark 9ch Report
-
-The first unified report is available at:
+Datasets are expected outside this repository. Current local defaults:
 
 ```text
-D:/ProjData/proj_python/vep_arena/results/benchmark_9ch/report.md
+D:\ProjData\datasets\ssvep_benchmark
+D:\ProjData\datasets\ssvep_beta
+D:\ProjData\datasets\ssvep_wearable
 ```
 
-To rebuild it from the current imported results and TDCA run:
+BETA and wearable datasets are accessed through the local
+SSVEP-Analysis-Toolbox adapter. The toolbox repository is treated as an external
+reference, not vendored into this repo.
+
+The BETA root can be overridden for task scripts:
 
 ```powershell
-cd D:/ProjData/proj_python/vep_arena
-.venv/Scripts/python.exe scripts/build_report.py
+$env:SSVEP_BETA_ROOT = "D:\ProjData\datasets\ssvep_beta"
 ```
 
-To rerun TDCA:
+## Current BETA Baseline Task
+
+Rebuild the `0.2-2.0s` BETA 9ch comparison plot from existing summaries:
 
 ```powershell
-cd D:/ProjData/proj_python/vep_arena
-.venv/Scripts/python.exe scripts/run_tdca.py --subjects 1-35 --blocks 1-6 --windows default --output-dir runs/tdca
+.venv\Scripts\python.exe tasks\beta_ssvep_9ch_baselines\plot_acc_itr.py
 ```
 
-To verify the TRCA-Net feature adapter:
+Run the full BETA 9ch baseline task:
 
 ```powershell
-cd D:/ProjData/proj_python/vep_arena
-.venv/Scripts/python.exe scripts/check_trcanet_features.py --subject 1 --block 1 --window 0.4
+.venv\Scripts\python.exe tasks\beta_ssvep_9ch_baselines\run.py
 ```
 
-## Next Direction
+The current methods are:
 
-After this first Benchmark 9ch report is stable, the same structure can add:
+```text
+CCA, FBCCA, TRCA, ETRCA, TDCA
+```
 
-- FBCCA, eCCA, TRCA variants, TDCA variants
-- EEGNet and other neural baselines
-- BETA, Nakanishi2015, wearable SSVEP datasets
-- MNE-based feature analysis
-- spectral/SNR/phase diagnostics
-- t-SNE or UMAP feature visualizations
-- online-style prediction demos
+The evaluation protocol is subject-specific leave-one-block-out over 70 BETA
+subjects, 4 blocks, 40 targets, and the `occipital_9ch` channel preset.
+
+## Compatibility Entry Points
+
+The existing top-level scripts remain usable while the project moves toward
+task-owned outputs:
+
+```powershell
+.venv\Scripts\python.exe scripts\run_toolbox_ssvep.py --dataset beta --root D:\ProjData\datasets\ssvep_beta --subjects 1-70 --blocks 1-4 --targets 0-39 --channels occipital_9ch --windows 0.2:0.2:2.0 --methods CCA,FBCCA,TRCA,ETRCA,TDCA --workers 6
+
+.venv\Scripts\python.exe scripts\plot_beta_w02_20_compare.py
+```
+
+## Notes
+
+- Accuracy is directly comparable across current Arena BETA summaries.
+- Current ITR uses the Arena denominator `window + dataset break`. Toolbox
+  documentation often includes latency and computation time, so strict ITR
+  comparison needs an additional `itr_with_latency` or toolbox-style column.
+- MNE/ERP/image-VEP work should reuse `vep_arena.data` and `vep_arena.neuroviz`
+  rather than creating dataset-specific plotting forks.

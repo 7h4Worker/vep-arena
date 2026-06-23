@@ -5,20 +5,22 @@ from pathlib import Path
 from vep_arena.plots.comparison_curves import AccItrPlotSpec, load_summaries, plot_acc_itr
 
 
-PROJECT = Path(__file__).resolve().parents[1]
-RESULTS = PROJECT / "results"
-OUT = RESULTS / "beta_toolbox_9ch_w02_20s_compare"
-SOURCES = [
-    RESULTS / "beta_toolbox_9ch_w02_20s_cca_fbcca_trca_tdca" / "summary.csv",
-    RESULTS / "beta_toolbox_9ch_w02_20s_etrca" / "summary.csv",
+TASK = Path(__file__).resolve().parent
+PROJECT = TASK.parents[1]
+TASK_RESULTS = TASK / "results"
+RUNNER_SUMMARY = TASK_RESULTS / "runner_full" / "summary.csv"
+LEGACY_SOURCES = [
+    PROJECT / "results" / "beta_toolbox_9ch_w02_20s_cca_fbcca_trca_tdca" / "summary.csv",
+    PROJECT / "results" / "beta_toolbox_9ch_w02_20s_etrca" / "summary.csv",
 ]
 
 
 def main() -> None:
-    summary = load_summaries(SOURCES)
+    sources = [RUNNER_SUMMARY] if RUNNER_SUMMARY.exists() else LEGACY_SOURCES
+    summary = load_summaries(sources)
     plot_acc_itr(
         summary,
-        OUT,
+        TASK_RESULTS,
         AccItrPlotSpec(
             title="BETA SSVEP: Arena Toolbox-Preprocessed Baselines",
             accuracy_title="BETA 9ch Accuracy (0.2-2.0s)",
@@ -30,3 +32,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
