@@ -397,8 +397,7 @@ def finetune_from_checkpoint(
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-root", type=Path, default=DATA_ROOT)
-    parser.add_argument("--dnn-project-root", type=Path, default=Path("D:/ProjData/proj_python/dnn_ssvep_pytorch"))
-    parser.add_argument("--registry", type=Path, default=Path("D:/ProjData/proj_python/dnn_ssvep_pytorch/results_clean/model_registry.csv"))
+    parser.add_argument("--registry", type=Path, default=RESULT_ROOT / "dnn_import_existing" / "model_registry.csv")
     parser.add_argument("--output-dir", type=Path, default=RESULT_ROOT / "dnn_checkpoint_eval")
     parser.add_argument("--subjects", default="1-35")
     parser.add_argument("--blocks", default="1-6")
@@ -419,9 +418,8 @@ def main() -> None:
     parser.add_argument("--save-global-models", action="store_true")
     args = parser.parse_args()
 
-    sys.path.insert(0, str(args.dnn_project_root))
     import torch
-    from dnn_ssvep.model import DNNSsvep
+    from vep_arena.nn.dnn_ssvep import DNNSsvep
 
     spec = BenchmarkSpec()
     subjects = parse_range(args.subjects)
@@ -610,7 +608,6 @@ def main() -> None:
         "save_global_models": args.save_global_models,
         "device": str(device),
         "torch": torch.__version__,
-        "dnn_project_root": str(args.dnn_project_root),
         "registry": str(args.registry),
         "preprocessing": {
             "crop_start_seconds": spec.cue_seconds + spec.latency_seconds,

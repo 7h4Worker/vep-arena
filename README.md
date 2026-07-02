@@ -43,6 +43,12 @@ tasks/<dataset>_<scope>_<purpose>/
 runtime logs, and intermediate files are not committed accidentally. Compact
 CSV/PNG artifacts can be force-added when we explicitly want to publish them.
 
+Experiment outputs should follow the project artifact contract in
+`docs/result_artifact_contract.md`. In short: runnable experimental results
+must preserve trial-level `predictions.csv` plus confusion artifacts whenever
+classification predictions exist; summary-only directories are treated as
+derived aggregate views, not complete experimental runs.
+
 ## Data
 
 Datasets are expected outside this repository. Current local defaults:

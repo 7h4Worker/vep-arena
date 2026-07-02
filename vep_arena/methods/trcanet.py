@@ -87,49 +87,17 @@ def project_with_trca_filters(eeg: np.ndarray, weights: np.ndarray, fs: int) -> 
 
 
 class TRCANetTorchMixin:
-    """Factory for the CNN part, imported lazily to keep torch optional."""
+    """Factory for the CNN part.  Delegates to ``vep_arena.nn.trcanet``."""
 
     @staticmethod
     def make_model(filters: int, samples: int, subbands: int, classes: int, dropout: float, final_dropout: float):
-        import torch
-        from torch import nn
+        from vep_arena.nn.trcanet import TRCANet
 
-        class TRCANet(nn.Module):
-            def __init__(self) -> None:
-                super().__init__()
-                self.subband_conv = nn.Conv2d(subbands, 1, kernel_size=(1, 1), bias=False)
-                self.filter_conv = nn.Conv2d(1, 120, kernel_size=(filters, 1))
-                self.dropout1 = nn.Dropout(dropout)
-                self.temporal_conv = nn.Conv2d(120, 120, kernel_size=(1, 2), stride=(1, 2))
-                self.dropout2 = nn.Dropout(dropout)
-                self.relu = nn.ReLU()
-                self.refine_conv = nn.Conv2d(120, 120, kernel_size=(1, 10), padding="same")
-                self.dropout3 = nn.Dropout(final_dropout)
-                with torch.no_grad():
-                    dummy = torch.zeros(1, subbands, filters, samples)
-                    flat = self._features(dummy).flatten(1).shape[1]
-                self.classifier = nn.Linear(flat, classes)
-                self.reset_parameters()
-
-            def reset_parameters(self) -> None:
-                nn.init.ones_(self.subband_conv.weight)
-                for layer in (self.filter_conv, self.temporal_conv, self.refine_conv, self.classifier):
-                    nn.init.normal_(layer.weight, mean=0.0, std=0.01)
-                    if layer.bias is not None:
-                        nn.init.zeros_(layer.bias)
-
-            def _features(self, x):
-                x = self.subband_conv(x)
-                x = self.filter_conv(x)
-                x = self.dropout1(x)
-                x = self.temporal_conv(x)
-                x = self.dropout2(x)
-                x = self.relu(x)
-                x = self.refine_conv(x)
-                x = self.dropout3(x)
-                return x
-
-            def forward(self, x):
-                return self.classifier(self._features(x).flatten(1))
-
-        return TRCANet()
+        return TRCANet(
+            filters=filters,
+            samples=samples,
+            subbands=subbands,
+            classes=classes,
+            dropout=dropout,
+            final_dropout=final_dropout,
+        )

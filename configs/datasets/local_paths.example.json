@@ -1,0 +1,15 @@
+{
+  "dataset_root": "D:/ProjData/datasets",
+  "datasets": {
+    "ssvep_benchmark": "D:/ProjData/datasets/ssvep_benchmark",
+    "ssvep_beta": "D:/ProjData/datasets/ssvep_beta",
+    "ssvep_wearable": "D:/ProjData/datasets/ssvep_wearable",
+    "ssvep_nakanishi_12jfpm": "D:/ProjData/datasets/ssvep_nakanishi_12jfpm",
+    "ssvep_hd_200target": "D:/ProjData/datasets/ssvep_hd_200target",
+    "ssvep_spatial_chen2017": "D:/ProjData/datasets/ssvep_spatial_chen2017",
+    "cvep_thielen2021": "D:/ProjData/datasets/cvep_thielen2021",
+    "cvep_castillos100": "D:/ProjData/datasets/cvep_castillos100",
+    "p300_basic": "D:/ProjData/datasets/p300_basic",
+    "avep_mvep": "D:/ProjData/datasets/avep_mvep"
+  }
+}

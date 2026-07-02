@@ -46,7 +46,7 @@ def complete_run(path: Path) -> bool:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output-dir", type=Path, default=RESULT_ROOT / "dnn_w02_2s_arena")
-    parser.add_argument("--dnn-python", type=Path, default=Path("D:/ProjData/proj_python/dnn_ssvep_pytorch/.venv/Scripts/python.exe"))
+    parser.add_argument("--dnn-python", type=Path, default=Path(sys.executable))
     parser.add_argument("--subjects", default="1-35")
     parser.add_argument("--blocks", default="1-6")
     parser.add_argument("--windows", default="0.2:0.1:2.0")

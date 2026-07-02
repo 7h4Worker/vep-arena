@@ -22,6 +22,7 @@ tasks/**/results/**
 # Large/raw data and binary documents kept outside source control
 /data/
 /datasets/
+configs/datasets/local_paths.json
 docs/papers/
 docs/paper_notes/**/full_text.txt
 docs/paper_notes/**/page_*.txt
