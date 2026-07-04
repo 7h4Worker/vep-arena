@@ -19,11 +19,19 @@ tasks/**/results/**
 !tasks/**/results/
 !tasks/**/results/.gitkeep
 
+# Keep task source local by default. Version-control only the task overview and
+# one minimal smoke example; full experiment tasks stay local until curated.
+tasks/*
+!tasks/README.md
+!tasks/benchmark_trcanet_smoke/
+!tasks/benchmark_trcanet_smoke/run.py
+
 # Large/raw data and binary documents kept outside source control
 /data/
 /datasets/
 configs/datasets/local_paths.json
 docs/papers/
+docs/ppt_figures/
 docs/paper_notes/**/full_text.txt
 docs/paper_notes/**/page_*.txt
 *.mat
