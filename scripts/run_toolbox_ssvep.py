@@ -26,7 +26,7 @@ from vep_arena.data.toolbox_adapter import (
 )
 from vep_arena.metrics import itr_bits_per_minute
 from vep_arena.methods.tdca import TDCA
-from vep_arena.methods.traditional import CCA, FBCCA, TRCA
+from vep_arena.methods.traditional import CCA, ECCA, FBCCA, TRCA
 
 
 def parse_range(text: str) -> list[int]:
@@ -39,6 +39,14 @@ def parse_range(text: str) -> list[int]:
         elif part:
             values.append(int(part))
     return values
+
+
+WINDOW_PRESETS = {
+    "w02_10_step01": "0.2:0.1:1.0",
+    "w02_10_step02": "0.2:0.2:1.0",
+    "w02_20_step01": "0.2:0.1:2.0",
+    "w02_20_step02": "0.2:0.2:2.0",
+}
 
 
 def parse_windows(text: str) -> list[float]:
@@ -83,6 +91,15 @@ def make_model(method: str, window: float, spec: BenchmarkSpec, info, args: argp
         return CCA(window=window, harmonics=args.harmonics, spec=spec, frequencies=info.frequencies, phases_pi=info.phases)
     if method == "FBCCA":
         return FBCCA(
+            window=window,
+            harmonics=args.harmonics,
+            n_fbs=args.n_bands,
+            spec=spec,
+            frequencies=info.frequencies,
+            phases_pi=info.phases,
+        )
+    if method == "ECCA":
+        return ECCA(
             window=window,
             harmonics=args.harmonics,
             n_fbs=args.n_bands,
@@ -189,11 +206,11 @@ def run_subject_window_task(task: dict[str, object]) -> dict[str, object]:
         data_by_method["CCA"] = dataset.get_trials(
             subject, blocks, targets, channels, window, preprocess="raw", n_bands=1, filter_window=filter_window
         ).x
-    if any(method in methods for method in ("FBCCA", "TRCA", "ETRCA")):
+    if any(method in methods for method in ("FBCCA", "ECCA", "TRCA", "ETRCA")):
         fb = dataset.get_trials(
             subject, blocks, targets, channels, window, preprocess="toolbox_fb", n_bands=args.n_bands, filter_window=filter_window
         ).x
-        for method in ("FBCCA", "TRCA", "ETRCA"):
+        for method in ("FBCCA", "ECCA", "TRCA", "ETRCA"):
             if method in methods:
                 data_by_method[method] = fb
     if "TDCA" in methods:
@@ -310,7 +327,8 @@ def main() -> None:
     parser.add_argument("--targets")
     parser.add_argument("--channels", default="occipital_9ch")
     parser.add_argument("--windows", default="0.2:0.2:2.0")
-    parser.add_argument("--methods", default="CCA,FBCCA,TRCA,TDCA")
+    parser.add_argument("--window-preset", choices=sorted(WINDOW_PRESETS))
+    parser.add_argument("--methods", default="CCA,FBCCA,ECCA,TRCA,TDCA")
     parser.add_argument("--harmonics", type=int, default=5)
     parser.add_argument("--n-bands", type=int, default=5)
     parser.add_argument("--n-components", type=int, default=8)
@@ -325,7 +343,8 @@ def main() -> None:
     subjects = parse_range(args.subjects)
     blocks = parse_range(args.blocks) if args.blocks else list(info.blocks)
     targets = parse_range(args.targets) if args.targets else list(info.targets)
-    windows = parse_windows(args.windows)
+    window_text = WINDOW_PRESETS[args.window_preset] if args.window_preset else args.windows
+    windows = parse_windows(window_text)
     methods = method_names(args.methods)
     filter_window = max(windows)
     spec = spec_from_info(info)

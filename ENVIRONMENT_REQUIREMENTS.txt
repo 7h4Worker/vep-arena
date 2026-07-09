@@ -1,0 +1,32 @@
+VEP Arena local environment requirements
+Last updated: 2026-07-09
+
+Canonical agent/task Python:
+  D:\ProjData\proj_python\vep_arena\.venv\Scripts\python.exe
+
+Source of truth:
+  pyproject.toml
+  uv.lock
+
+Setup / repair:
+  cd D:\ProjData\proj_python\vep_arena
+  uv sync --extra all
+
+Validation:
+  .venv\Scripts\python.exe scripts\check_neuro_env.py
+  .venv\Scripts\python.exe -c "import mne, torch, pptx; print(mne.__version__, torch.__version__)"
+
+Installed dependency groups:
+  core    numpy, scipy, scikit-learn, pandas, matplotlib, h5py, data loaders
+  torch   PyTorch CUDA runtime for DNN/SSVEPFormer/TRCANet helpers
+  neuro   MNE and MOABB for EEG QA, FIR filtering, topomaps, and dataset bridges
+  reports python-pptx for local PPT/report helpers
+
+Execution discipline:
+  Do not use bare python for official runs.
+  Do not silently substitute official backends with approximate fallbacks.
+  Result directories under tasks/**/results/** and results/** remain local artifacts and are ignored by git.
+
+Legacy environment:
+  D:\ProjData\envs\erp_ssvep_lab
+  Keep only as a PsychoPy/online-experiment fallback unless a task explicitly requires it.

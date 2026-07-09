@@ -49,6 +49,28 @@ must preserve trial-level `predictions.csv` plus confusion artifacts whenever
 classification predictions exist; summary-only directories are treated as
 derived aggregate views, not complete experimental runs.
 
+## Environment
+
+The canonical local Arena Python is the repository virtual environment:
+
+```powershell
+D:\ProjData\proj_python\vep_arena\.venv\Scripts\python.exe
+```
+
+Keep it synchronized from `pyproject.toml` and `uv.lock`:
+
+```powershell
+cd D:\ProjData\proj_python\vep_arena
+uv sync --extra all
+.venv\Scripts\python.exe scripts\check_neuro_env.py
+```
+
+`--extra all` installs the core scientific stack plus torch, MNE/MOABB, and
+report-generation dependencies. Do not use bare `python` for official runs.
+The older conda environment `D:\ProjData\envs\erp_ssvep_lab` is only a legacy
+PsychoPy/online-experiment fallback, not the default Arena execution
+environment.
+
 ## Data
 
 Datasets are expected outside this repository. Current local defaults:

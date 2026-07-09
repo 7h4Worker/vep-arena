@@ -18,13 +18,18 @@ runs/
 tasks/**/results/**
 !tasks/**/results/
 !tasks/**/results/.gitkeep
+tasks/**/analysis/**/figures/**
+tasks/**/analysis/**/tables/**
 
-# Keep task source local by default. Version-control only the task overview and
-# one minimal smoke example; full experiment tasks stay local until curated.
-tasks/*
-!tasks/README.md
-!tasks/benchmark_trcanet_smoke/
-!tasks/benchmark_trcanet_smoke/run.py
+# Task source is versionable; generated outputs remain ignored above.
+!tasks/_legacy/
+tasks/_legacy/*
+!tasks/_legacy/README.md
+!tasks/_legacy/20260707_benchmark_smoke_tasks/
+tasks/_legacy/20260707_benchmark_smoke_tasks/*
+!tasks/_legacy/20260707_benchmark_smoke_tasks/README.md
+!tasks/_legacy/20260707_benchmark_smoke_tasks/benchmark_trcanet_smoke/
+!tasks/_legacy/20260707_benchmark_smoke_tasks/benchmark_trcanet_smoke/run.py
 
 # Large/raw data and binary documents kept outside source control
 /data/

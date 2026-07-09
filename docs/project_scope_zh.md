@@ -140,13 +140,12 @@ BETA 是当前项目的下一个数据集接入目标。接入顺序如下：
 
 ## 环境事实
 
-当前已有 MNE/PsychoPy 环境：
+当前 Arena 默认环境：
 
 ```text
-D:\ProjData\envs\erp_ssvep_lab\python.exe
+D:\ProjData\proj_python\vep_arena\.venv\Scripts\python.exe
 mne 1.12.1
-psychopy 2022.2.5
+torch 2.11.0+cu128
 ```
 
-当前 `vep_arena/.venv` 继续用于已有 benchmark 和脚本。涉及 MNE/PsychoPy 的脚本应明确标注推荐 Python 环境，后续再决定是否将 MNE 作为项目依赖写入 `pyproject.toml`。
-
+当前 `vep_arena/.venv` 是 Arena 任务和 agent 执行的默认 Python。涉及 MNE 的脚本直接使用该环境。`D:\ProjData\envs\erp_ssvep_lab` 保留为历史 PsychoPy/在线实验备用环境，不作为常规离线复现入口。
