@@ -31,3 +31,14 @@ Naming convention:
 
 Large datasets and external toolboxes stay outside the repository.
 
+Current public binocular workflows:
+
+- ssvep_binocular_dataset_smoke: file-integrity, event, waveform, and PSD
+  checks for Dual-Alpha and Ke 2025 Binocular AR.
+- ssvep_dual_alpha_baselines: paper-referenced ETRCA and FBDCCA evaluation on
+  the three Dual-Alpha paradigms.
+- ssvep_binocular_ar_trca: Arena CCA/FBCCA/TRCA/ETRCA evaluation for the
+  three Ke 2025 experiments.
+
+These tasks commit protocol notes and runnable code only. Their results/
+trees remain local and ignored.
