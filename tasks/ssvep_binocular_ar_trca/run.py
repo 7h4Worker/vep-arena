@@ -468,6 +468,9 @@ def main() -> None:
             "SciPy preprocessing is an explicit numerical adaptation"
         ),
         "evidence_role": "paper-referenced Arena reproduction; not bitwise official-code parity",
+        "python_executable": sys.executable,
+        "python_version": sys.version,
+        "preprocessing_backend": "SciPy continuous preprocessing and Chebyshev filterbank",
         "root": str(args.root),
         "subjects": subjects,
         "tasks": tasks,

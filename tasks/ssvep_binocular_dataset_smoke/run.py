@@ -276,6 +276,8 @@ def main() -> None:
             "args": vars(args),
             "created_at": datetime.now().isoformat(timespec="seconds"),
             "evidence_role": "dataset smoke and provenance check",
+            "python_executable": sys.executable,
+            "python_version": sys.version,
             "datasets": {
                 "dual_alpha": {
                     "dataset_doi": "10.5524/102557",
