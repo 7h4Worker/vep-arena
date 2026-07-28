@@ -1,29 +1,17 @@
-# SSVEP Binocular Dataset Smoke
+# 双目 SSVEP 数据集冒烟检查
 
-Task-owned data-probing workflow for two binocular SSVEP datasets:
+## 任务定位
 
-- `ssvep_dual_alpha_gigadb_102557`: Dual-Alpha dual-frequency SSVEP.
-- `ssvep_binocular_ar`: binocularly coded AR SSVEP.
+本 task 只负责 Dual-Alpha 与 Ke 2025 Binocular AR 两个公开数据集的数据完整性、事件表、时域波形、频谱和码本检查，不运行全量分类器，也不用于声明算法复现精度。
 
-This task is intentionally a dataset smoke and provenance workflow. It does not
-run full classifiers. It checks local file completeness, parses stimulus/event
-metadata, loads small sample windows, applies a transparent smoke
-preprocessing pass, and writes time-series/PSD figures.
+## 数据来源
 
-## Dataset Sources
+- Dual-Alpha：35 名受试者、40 个目标、5 个 block、250 Hz，包含 checkerboard、binocular vision 和 binocular-swap 三种范式；论文 doi:10.1093/gigascience/giae041，数据与代码 doi:10.5524/102557。
+- Binocular AR：24 名受试者、8 个目标、三个实验，覆盖单/双频与单/双相位双目条件；论文 doi:10.1038/s41597-025-05696-0，数据与代码为 Figshare article 26768287。
 
-- Dual-Alpha: 35 subjects, 40 targets, 5 blocks, 250 Hz, with checkerboard,
-  binocular-vision, and binocular-swap paradigms. Dataset paper
-  doi:10.1093/gigascience/giae041; GigaDB data/code doi:10.5524/102557.
-- Binocular AR: 24 subjects, 8 targets, three experiments covering
-  single-/dual-frequency and single-/dual-phase binocular conditions. Dataset
-  paper doi:10.1038/s41597-025-05696-0; public data/code in Figshare article
-  26768287.
+证据角色固定为 `dataset smoke`：只验证文件、事件、通道、波形和频谱，不替代正式分类 task。
 
-Evidence role: dataset integrity, event-table, waveform, and spectrum smoke
-only. This task does not establish classifier reproduction accuracy.
-
-## Run
+## 运行
 
 ```powershell
 .venv\Scripts\python.exe tasks\ssvep_binocular_dataset_smoke\run.py `
@@ -31,64 +19,40 @@ only. This task does not establish classifier reproduction accuracy.
   --out tasks\ssvep_binocular_dataset_smoke\results\latest
 ```
 
-Useful variants:
+常用子集：
 
 ```powershell
-# Dual-Alpha only, first subject, all three paradigms.
+# 只检查 Dual-Alpha：首名受试者、三个范式
 .venv\Scripts\python.exe tasks\ssvep_binocular_dataset_smoke\run.py `
   --dataset dual-alpha `
   --dual-alpha-subject 1
 
-# AR only, first complete local subject, selected task events.
+# 只检查 Binocular AR：首个完整受试者、指定任务
 .venv\Scripts\python.exe tasks\ssvep_binocular_dataset_smoke\run.py `
   --dataset binocular-ar `
   --ar-tasks LF,DFDP,DFDP1
 ```
 
-## Outputs
+## 产物
 
-`results/latest/` contains:
+`results/latest/` 包含：
 
-- `dual_alpha_file_status.csv`
-- `dual_alpha_codebook_summary.csv`
-- `binocular_ar_file_status.csv`
-- `binocular_ar_subXXX_task_inventory.csv`
-- `sample_summary.csv`
-- `sample_summary.json`
-- `run_manifest.json`
-- `smoke_report_zh.md`
-- `figures/*_timeseries.png`
-- `figures/*_psd.png`
-- `figures/dual_alpha_codebook_pairs.png`
+- 数据文件状态与 task inventory；
+- `sample_summary.csv`、`sample_summary.json`、`run_manifest.json`；
+- `smoke_report_zh.md`；
+- 时域图、PSD 图和 Dual-Alpha 码本配对图。
 
-The results directory is ignored by git. Keep durable report material by copying
-selected figures/tables into a curated report task after review.
+`results/` 由 Git 忽略。经过审查后需要长期保留的结论应写入 task REPORT，不复制生成 CSV/图片到版本控制。
 
-## Status Report
+## 论文对齐
 
-`REPORT_20260708.md` is the current cross-dataset status report. It covers both
-Dual-Alpha and Ke 2025 Binocular AR, and separates official baseline CSVs from
-Arena-run results.
+- `PAPER_ALIGNMENT_KE2025.md` 记录 Ke 2025 的采集、预处理、block、时间窗和 ITR 协议；
+- `REPORT_20260708.md` 汇总两个数据集的当前状态，并区分公开结果表与 Arena 本地运行；
+- Ke 正式分类使用论文 10 通道、两个 session 合并的 20 blocks、`0.1:0.1:3.0 s` 时间窗、49–51 Hz notch 和 5–95 Hz band-pass。
 
-## Paper Alignment
+## 范围边界
 
-`PAPER_ALIGNMENT_KE2025.md` records the protocol extracted from Ke et al. 2025
-for the binocular AR dataset. The important implications for a formal TRCA run
-are:
-
-- use the 10 paper-analysis electrodes: `PO7, PO5, PO3, POz, PO4, PO6, PO8, O1, Oz, O2`;
-- reconstruct 20 blocks per condition from two sessions when both sessions are available;
-- follow leave-one-block-out cross-validation;
-- evaluate data lengths from 0.1 s to 3.0 s in 0.1 s steps;
-- apply the paper preprocessing before classification: 49-51 Hz notch and 5-95 Hz band-pass.
-
-## Scope
-
-Dual-Alpha is already epoch-level CSV, so TRCA/ETRCA can be built directly on
-`condition` and `epoch`. CCA-family dual-frequency methods must use both
-`Freq1` and `Freq2` from `Stimulate_Code.txt`.
-
-Binocular AR is continuous BIDS-like EEG with event tables. The smoke loader
-reads one short epoch around an event from `*_eeg.fdt`, using `*_events.tsv`,
-`*_channels.tsv`, and `*_eeg.json`. This is sufficient for signal inspection
-but not yet a full epoching/classification implementation.
+- Dual-Alpha 已提供 epoch 级 CSV，可直接按 `condition` 与 `epoch` 组织 block；
+- Binocular AR 为连续 BIDS-like EEG，需要根据 event table 切窗；
+- smoke 读取器只用于信号检查，正式分类由独立 task 负责；
+- 原始数据、下载包、CSV/NPY、图片和缓存不得提交。

@@ -510,29 +510,29 @@ def plot_outputs(summary: pd.DataFrame, subject: pd.DataFrame, official: pd.Data
 
 def write_report(summary: pd.DataFrame, result_dir: Path, manifest: dict[str, object]) -> None:
     lines = [
-        "# Dual-Alpha Baseline Task Report",
+        "# Dual-Alpha 基线运行报告",
         "",
-        "Protocol: GigaDB 102557 Dual-Alpha epoch CSV, subject-specific 5-block leave-one-block-out.",
-        "Official TRCA uses ensemble mode; Arena reports that aligned baseline as ETRCA.",
-        "ITR uses 40 classes and `window + 0.5 s`, matching the public example script.",
-        "Preprocessing: epoch CSV crop first samples; method-specific filterbank after crop.",
+        "协议：GigaDB 102557 Dual-Alpha epoch CSV，受试者内 5-block leave-one-block-out。",
+        "公开 TRCA 使用 ensemble 模式；Arena 将该对齐路径记为 ETRCA。",
+        "ITR 使用 40 类与 `window + 0.5 s`，与公开示例脚本一致。",
+        "预处理：先从 epoch CSV 首样点裁剪，再应用方法对应 filter bank。",
         "",
-        "## Run",
+        "## 运行配置",
         "",
-        f"- Subjects: `{manifest['subjects']}`",
-        f"- Paradigms: `{manifest['paradigms']}`",
-        f"- Windows: `{manifest['windows']}`",
-        f"- Methods: `{manifest['methods']}`",
-        f"- Channel set: `{manifest['channel_set']}`",
-        f"- Workers: `{manifest['workers']}`",
+        f"- 受试者：`{manifest['subjects']}`",
+        f"- 范式：`{manifest['paradigms']}`",
+        f"- 时间窗：`{manifest['windows']}`",
+        f"- 方法：`{manifest['methods']}`",
+        f"- 通道集：`{manifest['channel_set']}`",
+        f"- workers：`{manifest['workers']}`",
         "",
     ]
     if not summary.empty:
         lines.extend(
             [
-                "## Best Accuracy By Paradigm",
+                "## 各范式最优准确率",
                 "",
-                "| Paradigm | Method | Window | Accuracy | ITR | Subjects | Official Acc | Delta |",
+                "| 范式 | 方法 | 时间窗 | 准确率 | ITR | 受试者数 | 公开表准确率 | 差值 |",
                 "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |",
             ]
         )
@@ -547,7 +547,7 @@ def write_report(summary: pd.DataFrame, result_dir: Path, manifest: dict[str, ob
         lines.extend(
             [
                 "",
-                "## Output Files",
+                "## 输出文件",
                 "",
                 "- `trials.csv`",
                 "- `predictions.csv`",

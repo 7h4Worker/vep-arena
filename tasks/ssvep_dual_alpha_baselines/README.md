@@ -1,32 +1,33 @@
-# Dual-Alpha Baselines
+# Dual-Alpha 双频 SSVEP 基线
 
-Formal Arena task for the GigaDB 102557 Dual-Alpha dual-frequency SSVEP dataset.
+## 任务定位
 
-## References
+本 task 面向 GigaDB 102557 Dual-Alpha 数据集，复现公开代码覆盖的 ETRCA 与 FBDCCA 分类基线，并统一写出 Arena 运行清单、trial 级预测和公开结果表对照。
 
-- Dataset paper: Sun et al., "Dual-Alpha: a large EEG study for
-  dual-frequency SSVEP brain-computer interface," GigaScience, 2024,
-  doi:10.1093/gigascience/giae041.
-- Public data and source code: GigaDB dataset 102557,
-  doi:10.5524/102557 (CC0 1.0).
-- Dual-frequency method paper: Sun et al., IEEE TBME, 2023,
-  doi:10.1109/TBME.2022.3212192.
+实现身份：
 
-Evidence role: paper-and-public-code reproduction. FBDCCA's score equation and
-weights are ported from the distributed source; the selected FIR backend is
-recorded separately because it is part of the reproduction identity.
+- ETRCA：Arena ensemble TRCA，与公开脚本的 `meegkit.trca.TRCA(..., ensemble=True)` 调用对齐；
+- FBDCCA：分数公式和固定权重来自公开 `fbdcca_process.py`，滤波后端作为复现身份单独记录；
+- 不在公开代码范围内的算法或范式组合必须标记为扩展实验，不能混入公开范围结果。
 
-## Scope
+## 数据与论文
 
-- Paradigms: `Checkerboard_Arrangment`, `Binocular_Vision`, `Binocular-Swap_Vision`.
-- Official classification scope:
-  - `ETRCA`: Arena ensemble TRCA, aligned to the public script's `meegkit.trca.TRCA(..., ensemble=True)`.
-  - `FBDCCA`: official dual-frequency FBCCA-style classifier for `Checkerboard_Arrangment` and `Binocular_Vision`.
-- Default channels: `official`, meaning all channels in the public script. CA/BV use 9 channels, BsV uses 64 channels.
-- Windows: `0.2:0.2:2.0`.
-- CV: subject-specific 5-block leave-one-block-out; each subject has 40 targets x 5 epochs.
+- 数据论文：Sun et al., “Dual-Alpha: a large EEG study for dual-frequency SSVEP brain-computer interface,” GigaScience, 2024，doi:10.1093/gigascience/giae041。
+- 数据与公开代码：GigaDB 102557，doi:10.5524/102557，CC0 1.0。
+- 双频方法论文：Sun et al., IEEE TBME, 2023，doi:10.1109/TBME.2022.3212192。
+- 本地默认路径：`D:/ProjData/datasets/ssvep_dual_alpha_gigadb_102557`，可通过 `--root` 覆盖。
 
-## Run
+## 协议
+
+- 范式：`Checkerboard_Arrangment`、`Binocular_Vision`、`Binocular-Swap_Vision`。
+- 目标与 block：40 个目标，每名受试者 5 个 epoch/block。
+- 通道：CA/BV 使用公开脚本的 9 通道；BsV 使用 64 通道。
+- 时间窗：`0.2:0.2:2.0`。
+- 交叉验证：受试者内 5-block leave-one-block-out。
+- ITR 时间：`window + 0.5 s`。
+- 公开范围：ETRCA 覆盖 CA/BV/BsV；FBDCCA 覆盖 CA/BV。
+
+## 全量运行
 
 ```powershell
 $env:OMP_NUM_THREADS='1'
@@ -44,42 +45,26 @@ $env:NUMEXPR_NUM_THREADS='1'
   --out tasks\ssvep_dual_alpha_baselines\results\official_baselines
 ```
 
-Generated results stay under `results/` and are ignored by git.
+## 当前验证记录
 
-## Current Full Run
+2026-07-08 全量记录：
 
-Completed on 2026-07-08:
+- 105/105 个受试者/范式单元完成；
+- `trials.csv` 8750 行，`predictions.csv` 350000 行，`summary.csv` 50 行；
+- ETRCA 最优点与公开表差异不超过 0.16 pp；
+- FBDCCA 2.0 s 最优点：CA 差异 +0.36 pp，BV 差异 +0.74 pp。
 
-- Result dir: `tasks/ssvep_dual_alpha_baselines/results/official_baselines`
-- Python: generated with `D:\ProjData\envs\erp_ssvep_lab` during the MNE-FIR repair; future reruns should use the canonical `.venv` after `uv sync --extra all`.
-- FBDCCA backend: `mne-fir`.
-- Units: 105/105 complete.
-- Trial rows: 8750.
-- Prediction rows: 350000.
-- Summary rows: 50.
-- Figures: `accuracy_curve.png`, `itr_curve.png`, `accuracy_heatmap.png`, `subject_box_best.png`.
+该轮 MNE-FIR 修复由历史 PsychoPy 环境生成；后续正式重跑必须使用仓库 `.venv`，并在 manifest 记录解释器和后端。
 
-Best mean accuracy:
+## 预处理与已知限制
 
-| Paradigm | Method | Best window | Arena acc | Official acc | Delta |
-| --- | --- | ---: | ---: | ---: | ---: |
-| Checkerboard_Arrangment | ETRCA | 2.0s | 94.00% | 94.00% | +0.00 pp |
-| Checkerboard_Arrangment | FBDCCA | 2.0s | 27.67% | 27.31% | +0.36 pp |
-| Binocular_Vision | ETRCA | 2.0s | 88.31% | 88.16% | +0.16 pp |
-| Binocular_Vision | FBDCCA | 2.0s | 64.57% | 63.83% | +0.74 pp |
-| Binocular-Swap_Vision | ETRCA | 2.0s | 78.61% | 78.54% | +0.07 pp |
+- ETRCA/TRCA：使用公开脚本的 Chebyshev filter bank，默认 7 个子带；
+- FBDCCA：使用公开代码的频带、固定权重和双频 sine/cosine 参考，默认 5 个子带；
+- 正式 FBDCCA 运行必须使用 `--fbdcca-filter-backend mne-fir`；
+- 旧 SciPy FIR 近似只能保留在显式命名的 legacy/diagnostic 目录。
 
-## Preprocessing
+公开 FBDCCA 类会先将 epoch 裁剪到目标时间窗，再调用 MNE FIR。短窗下 MNE 可能提示 FIR 长度大于信号长度。Arena 为保持公开代码顺序保留该行为，并在 manifest 记录为已知限制；该警告不能被解释为短窗滤波已经干净有效。
 
-Dual-Alpha is already distributed as epoch-level CSV. The task crops each epoch from sample 0 to the requested window, then applies method-specific filter banks:
+## 产物与边界
 
-- ETRCA/TRCA: public TRCA pass/stop bands, Chebyshev filter bank, 7 subbands by default.
-- FBDCCA: public FBDCCA bands and weights, dual-frequency sine/cosine references, 5 subbands by default. Official runs require the public MNE FIR path (`--fbdcca-filter-backend mne-fir`). The old SciPy FIR approximation has been moved to `results/official_baselines_scipy_fir_legacy_20260708` and is not treated as an official baseline.
-
-The public FBDCCA class crops each epoch to the requested duration before
-calling MNE FIR filtering. At short windows, MNE can therefore warn that the
-designed filter is longer than the cropped signal. Arena preserves this order
-for public-code parity and records it as a known limitation in the manifest;
-the warning must not be silently interpreted as a clean short-window filter.
-
-This differs from the Ke 2025 Binocular AR task, where the source is continuous EEG and the task must first apply continuous demeaning/notch/bandpass and event-aligned epoching.
+生成结果全部位于 `results/`，由 Git 忽略。仓库只提交 runner、测试、协议、NOTES 和报告模板，不提交 EEG、CSV/NPY、图片、下载包或缓存。

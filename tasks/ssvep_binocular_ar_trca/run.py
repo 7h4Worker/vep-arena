@@ -368,26 +368,26 @@ def plot_outputs(summary: pd.DataFrame, subject: pd.DataFrame, result_dir: Path)
 
 def write_report(summary: pd.DataFrame, result_dir: Path, manifest: dict[str, object]) -> None:
     lines = [
-        "# Binocular AR Baseline Task Report",
+        "# Binocular AR 基线运行报告",
         "",
-        "Protocol: Ke et al. 2025 binocular AR epoch data, paper 10-channel preset, subject-specific leave-one-block-out.",
-        "Crop: event onset + 0.14 s visual latency; ITR selection time uses window + 1 s gaze shift, matching the official MATLAB scripts.",
-        "Preprocessing: Arena SciPy approximation of paper preprocessing, then official-code-style Chebyshev filterbank.",
+        "协议：Ke et al. 2025 binocular AR epoch 数据，论文 10 通道，受试者内 leave-one-block-out。",
+        "裁剪：事件 onset 后增加 0.14 s 视觉延迟；ITR 时间使用 window + 1.0 s，与公开 MATLAB 脚本一致。",
+        "预处理：论文预处理的 Arena SciPy 数值适配，再使用公开代码风格的 Chebyshev filter bank。",
         "",
-        "## Run",
+        "## 运行配置",
         "",
-        f"- Subjects: `{manifest['subjects']}`",
-        f"- Tasks: `{manifest['tasks']}`",
-        f"- Windows: `{manifest['windows']}`",
-        f"- Methods: `{manifest['methods']}`",
+        f"- 受试者：`{manifest['subjects']}`",
+        f"- task：`{manifest['tasks']}`",
+        f"- 时间窗：`{manifest['windows']}`",
+        f"- 方法：`{manifest['methods']}`",
         "",
     ]
     if not summary.empty:
-        lines.extend(["## Best Accuracy By Task", "", "| Task | Method | Window | Accuracy | ITR | Subjects |", "| --- | --- | ---: | ---: | ---: | ---: |"])
+        lines.extend(["## 各 task 最优准确率", "", "| Task | 方法 | 时间窗 | 准确率 | ITR | 受试者数 |", "| --- | --- | ---: | ---: | ---: | ---: |"])
         best = summary.sort_values("accuracy").groupby("task", as_index=False).tail(1).sort_values("task")
         for row in best.itertuples(index=False):
             lines.append(f"| {row.task} | {row.method} | {row.window:g}s | {row.accuracy:.4f} | {row.itr:.2f} | {row.subjects} |")
-        lines.extend(["", "## Output Files", "", "- `trials.csv`", "- `predictions.csv`", "- `summary.csv`", "- `subject.csv`", "- `runtime.csv`", "- `unit_manifest.csv`", "- `figures/accuracy_curve.png`", "- `figures/itr_curve.png`", "- `figures/accuracy_heatmap.png`"])
+        lines.extend(["", "## 输出文件", "", "- `trials.csv`", "- `predictions.csv`", "- `summary.csv`", "- `subject.csv`", "- `runtime.csv`", "- `unit_manifest.csv`", "- `figures/accuracy_curve.png`", "- `figures/itr_curve.png`", "- `figures/accuracy_heatmap.png`"])
     (result_dir / "report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
