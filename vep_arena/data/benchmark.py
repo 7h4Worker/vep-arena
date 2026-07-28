@@ -47,6 +47,37 @@ def load_subject_trials(
     return np.transpose(data, (2, 3, 0, 1)).copy()
 
 
+def load_subject_toolbox_raw(
+    data_root: Path,
+    subject: int,
+    window: float,
+    channels: tuple[int, ...] = BENCHMARK_CHANNELS_9,
+    spec: BenchmarkSpec | None = None,
+) -> np.ndarray:
+    """Return toolbox-style raw epochs as classes x blocks x channels x samples.
+
+    SSVEP-Analysis-Toolbox applies the registered preprocessing function to
+    the cue-offset segment containing latency + target window, then crops away
+    the visual latency. With the Benchmark preset this means a 50 Hz notch is
+    applied before latency cropping, even when no filterbank is registered.
+    """
+
+    spec = spec or BenchmarkSpec()
+    raw = load_subject_raw(data_root, subject)
+    channel_idx = np.asarray(channels, dtype=np.int64) - 1
+    latency = round(spec.latency_seconds * spec.sampling_rate)
+    samples = spec.sample_length(window)
+    start = round(spec.cue_seconds * spec.sampling_rate)
+    stop = start + latency + samples
+    out = np.zeros((spec.classes, spec.blocks, len(channels), samples), dtype=np.float64)
+    for cls in range(spec.classes):
+        for block in range(spec.blocks):
+            trial = raw[channel_idx, start:stop, cls, block]
+            trial = notch_50hz(trial, spec.sampling_rate)
+            out[cls, block] = trial[:, latency : latency + samples]
+    return out
+
+
 def notch_50hz(x: np.ndarray, fs: int) -> np.ndarray:
     b, a = signal.iircomb(50, 35, ftype="notch", fs=fs)
     return signal.filtfilt(b, a, x, axis=-1, padtype="odd", padlen=3 * (max(len(b), len(a)) - 1))

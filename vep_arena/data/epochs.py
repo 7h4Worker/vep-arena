@@ -4,6 +4,7 @@
 # Description: Part of the VEP Arena SSVEP benchmark workspace.
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -11,8 +12,22 @@ from pathlib import Path
 import numpy as np
 
 from vep_arena.config import PROJECT_ROOT
-from vep_arena.data.benchmark import load_subject_filterbank, load_subject_trials
+from vep_arena.data.benchmark import load_subject_filterbank, load_subject_toolbox_raw
 from vep_arena.data.presets import DatasetPreset
+
+
+FILTERBANK_VERSION = "ssvep_analysis_toolbox_benchmark_8k"
+RAW_VERSION = "ssvep_analysis_toolbox_notch_latency_crop"
+
+
+def channel_slug(channels: tuple[int, ...]) -> str:
+    """Return a stable cache-file slug without expanding long channel lists."""
+
+    expanded = "-".join(str(ch) for ch in channels)
+    if len(expanded) <= 48:
+        return expanded
+    digest = hashlib.sha1(",".join(str(ch) for ch in channels).encode("utf-8")).hexdigest()[:10]
+    return f"{len(channels)}ch_{digest}"
 
 
 @dataclass(frozen=True)
@@ -40,6 +55,8 @@ class EpochRequest:
             "window": self.window,
             "kind": self.kind,
             "n_fbs": self.n_fbs,
+            "filterbank_version": FILTERBANK_VERSION if self.kind == "filterbank" else None,
+            "raw_version": RAW_VERSION if self.kind == "raw" else None,
             "extra_samples": self.extra_samples,
             "samples": self.samples,
             "cache_window": self.cache_window,
@@ -55,7 +72,7 @@ class CanonicalEpochStore:
         self.root = root or PROJECT_ROOT / "runs" / "canonical_epochs"
 
     def path_for(self, request: EpochRequest) -> Path:
-        channels = "-".join(str(ch) for ch in request.preset.channels)
+        channels = channel_slug(request.preset.channels)
         cache_window = request.cache_window if request.cache_window is not None else request.window
         name = (
             f"{request.preset.name}"
@@ -63,6 +80,7 @@ class CanonicalEpochStore:
             f"_maxw{cache_window:g}"
             f"_{request.kind}"
             f"_fb{request.n_fbs}"
+            f"_{FILTERBANK_VERSION if request.kind == 'filterbank' else RAW_VERSION}"
             f"_extra{request.extra_samples}"
             f"_ch{channels}.npz"
         )
@@ -106,7 +124,7 @@ def build_epochs_for_cache(request: EpochRequest) -> np.ndarray:
     if request.kind == "raw":
         if request.extra_samples:
             raise ValueError("raw canonical epochs do not support extra_samples yet.")
-        return load_subject_trials(
+        return load_subject_toolbox_raw(
             preset.data_root,
             request.subject,
             cache_window,
@@ -139,6 +157,8 @@ def epoch_fingerprint(request: EpochRequest) -> dict[str, object]:
         "preset": preset.name,
         "dataset": preset.dataset,
         "kind": request.kind,
+        "filterbank_version": FILTERBANK_VERSION if request.kind == "filterbank" else None,
+        "raw_version": RAW_VERSION if request.kind == "raw" else None,
         "subject": request.subject,
         "window": request.window,
         "channels": list(preset.channels),

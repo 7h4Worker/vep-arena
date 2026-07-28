@@ -24,9 +24,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from vep_arena.config import DATA_ROOT, PROJECT_ROOT, RUN_ROOT, WINDOWS, BenchmarkSpec
 from vep_arena.data.epochs import CanonicalEpochStore, EpochRequest, epoch_fingerprint
-from vep_arena.data.presets import benchmark_9ch_default
+from vep_arena.data.presets import DatasetPreset, benchmark_9ch_default, benchmark_64ch_default
 from vep_arena.metrics import itr_bits_per_minute, sem
-from vep_arena.methods.traditional import CCA, FBCCA, TRCA
+from vep_arena.methods.traditional import CCA, ECCA, FBCCA, SSCOR, TRCA
 
 
 def confusion_counts(true: pd.Series, pred: pd.Series, classes: int) -> np.ndarray:
@@ -99,11 +99,25 @@ def make_model(name: str, window: float, args: argparse.Namespace, spec: Benchma
         return CCA(window=window, harmonics=args.harmonics, spec=spec)
     if name == "FBCCA":
         return FBCCA(window=window, harmonics=args.harmonics, n_fbs=args.n_fbs, spec=spec)
+    if name == "ECCA":
+        return ECCA(window=window, harmonics=args.harmonics, n_fbs=args.n_fbs, spec=spec)
     if name == "TRCA":
         return TRCA(n_fbs=args.n_fbs, ensemble=False)
     if name == "ETRCA":
         return TRCA(n_fbs=args.n_fbs, ensemble=True)
+    if name == "SSCOR":
+        return SSCOR(n_fbs=args.n_fbs, ensemble=False)
+    if name == "ESSCOR":
+        return SSCOR(n_fbs=args.n_fbs, ensemble=True)
     raise ValueError(f"Unknown method: {name}")
+
+
+def resolve_benchmark_preset(name: str, data_root: Path) -> DatasetPreset:
+    if name == "benchmark_9ch":
+        return benchmark_9ch_default(data_root)
+    if name == "benchmark_64ch":
+        return benchmark_64ch_default(data_root)
+    raise ValueError(f"Unknown Benchmark channel preset: {name}")
 
 
 def load_epochs(
@@ -113,9 +127,9 @@ def load_epochs(
     args: argparse.Namespace,
     store: CanonicalEpochStore,
 ) -> np.ndarray:
-    preset = benchmark_9ch_default(args.data_root)
+    preset = resolve_benchmark_preset(getattr(args, "channel_preset", "benchmark_9ch"), args.data_root)
     cache_window = getattr(args, "cache_window", window)
-    if name == "CCA":
+    if name in ("CCA",):
         raw = store.load_or_create(
             EpochRequest(preset=preset, subject=subject, window=window, kind="raw", cache_window=cache_window)
         )
@@ -297,9 +311,9 @@ def write_report(summary: pd.DataFrame, out: Path) -> None:
     ranking = summary.groupby("method", as_index=False)["accuracy"].mean().sort_values("accuracy", ascending=False)
     best = summary.sort_values("accuracy").groupby("window").tail(1).sort_values("window")
     lines = [
-        "# Traditional Benchmark 9ch Evaluation",
+        "# Traditional Benchmark Evaluation",
         "",
-        "Protocol: Tsinghua Benchmark 9-channel, subject-specific leave-one-block-out.",
+        "Protocol: Tsinghua Benchmark selected-channel preset, subject-specific leave-one-block-out.",
         "Preprocessing: 0.5 s cue skipped, 0.14 s visual latency handled, 50 Hz notch, toolbox-style filterbank for FBCCA/TRCA.",
         "",
         "## Mean Ranking",
@@ -372,7 +386,7 @@ def run_subject_window_task(task: dict[str, object]) -> dict[str, object]:
     data_root = Path(str(task["data_root"]))
     epoch_cache = Path(str(task["epoch_cache"]))
     result_dir = Path(str(task["result_dir"]))
-    preset = benchmark_9ch_default(data_root)
+    preset = resolve_benchmark_preset(str(task.get("channel_preset", "benchmark_9ch")), data_root)
     store = CanonicalEpochStore(epoch_cache)
     subject = int(task["subject"])
     window = float(task["window"])
@@ -388,11 +402,13 @@ def run_subject_window_task(task: dict[str, object]) -> dict[str, object]:
 
     load_started = time.perf_counter()
     data_by_method: dict[str, np.ndarray] = {}
-    if "CCA" in methods:
+    if any(method in methods for method in ("CCA",)):
         req = EpochRequest(preset=preset, subject=subject, window=window, kind="raw", cache_window=cache_window)
         raw = store.load_or_create(req, force=force_epochs)
-        data_by_method["CCA"] = raw[:, :, None, :, :]
-    if any(method in methods for method in ("FBCCA", "TRCA", "ETRCA")):
+        for method in ("CCA",):
+            if method in methods:
+                data_by_method[method] = raw[:, :, None, :, :]
+    if any(method in methods for method in ("FBCCA", "ECCA", "TRCA", "ETRCA", "SSCOR", "ESSCOR")):
         req = EpochRequest(
             preset=preset,
             subject=subject,
@@ -402,7 +418,7 @@ def run_subject_window_task(task: dict[str, object]) -> dict[str, object]:
             cache_window=cache_window,
         )
         filtered_epochs = store.load_or_create(req, force=force_epochs)
-        for method in ("FBCCA", "TRCA", "ETRCA"):
+        for method in ("FBCCA", "ECCA", "TRCA", "ETRCA", "SSCOR", "ESSCOR"):
             if method in methods:
                 data_by_method[method] = filtered_epochs
 
@@ -427,7 +443,7 @@ def run_subject_window_task(task: dict[str, object]) -> dict[str, object]:
             predict_done = time.perf_counter()
             if save_scores:
                 save_score_matrix(result_dir, method, window, subject, block, scores)
-            if save_filters and method in ("TRCA", "ETRCA"):
+            if save_filters and method in ("TRCA", "ETRCA", "SSCOR", "ESSCOR"):
                 save_trca_artifact(result_dir, method, window, subject, block, model)
             artifact_done = time.perf_counter()
             seconds = predict_done - t0
@@ -510,6 +526,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-root", type=Path, default=DATA_ROOT)
     parser.add_argument("--task-name", default="traditional_9ch")
+    parser.add_argument("--channel-preset", choices=["benchmark_9ch", "benchmark_64ch"], default="benchmark_9ch")
     parser.add_argument("--subjects", default="1-35")
     parser.add_argument("--blocks", default="1-6")
     parser.add_argument("--windows", default="default")
@@ -525,7 +542,7 @@ def main() -> None:
     args = parser.parse_args()
 
     spec = BenchmarkSpec()
-    preset = benchmark_9ch_default(args.data_root)
+    preset = resolve_benchmark_preset(args.channel_preset, args.data_root)
     store = CanonicalEpochStore(args.epoch_cache)
     subjects = parse_range(args.subjects)
     blocks = parse_range(args.blocks)
@@ -541,7 +558,9 @@ def main() -> None:
     manifest = {
         "task_name": args.task_name,
         "dataset": "Tsinghua Benchmark SSVEP",
-        "channels": "Benchmark 9ch: Pz, PO3, PO5, PO4, PO6, POz, O1, Oz, O2",
+        "channel_preset": args.channel_preset,
+        "channels": list(preset.channels),
+        "n_channels": len(preset.channels),
         "protocol": "subject-specific leave-one-block-out",
         "subjects": subjects,
         "blocks": blocks,
@@ -596,6 +615,7 @@ def main() -> None:
         tasks = [
             {
                 "data_root": str(args.data_root),
+                "channel_preset": args.channel_preset,
                 "epoch_cache": str(args.epoch_cache),
                 "result_dir": str(result_dir),
                 "subject": subject,

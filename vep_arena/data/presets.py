@@ -7,7 +7,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-from vep_arena.config import BENCHMARK_CHANNELS_9, DATA_ROOT, BenchmarkSpec
+from vep_arena.config import BENCHMARK_CHANNELS_9, BENCHMARK_CHANNELS_64, DATA_ROOT, BenchmarkSpec
 
 
 @dataclass(frozen=True)
@@ -55,6 +55,19 @@ def benchmark_9ch_default(data_root: Path = DATA_ROOT) -> DatasetPreset:
         channels=BENCHMARK_CHANNELS_9,
         spec=BenchmarkSpec(),
         description="Canonical Benchmark 9ch epochs: skip 0.5 s cue/pre-stim and 0.14 s visual latency.",
+    )
+
+
+def benchmark_64ch_default(data_root: Path = DATA_ROOT) -> DatasetPreset:
+    """Tsinghua Benchmark full 64-channel canonical preset."""
+
+    return DatasetPreset(
+        name="benchmark_64ch_cue0.5_latency0.14",
+        dataset="Tsinghua Benchmark SSVEP",
+        data_root=data_root,
+        channels=BENCHMARK_CHANNELS_64,
+        spec=BenchmarkSpec(),
+        description="Canonical Benchmark 64ch epochs: skip 0.5 s cue/pre-stim and 0.14 s visual latency.",
     )
 
 

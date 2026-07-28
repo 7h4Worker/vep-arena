@@ -15,6 +15,7 @@ RUN_ROOT = PROJECT_ROOT / "runs"
 
 
 BENCHMARK_CHANNELS_9 = (48, 54, 55, 56, 57, 58, 61, 62, 63)
+BENCHMARK_CHANNELS_64 = tuple(range(1, 65))
 BENCHMARK_FREQS = (
     8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0,
     8.2, 9.2, 10.2, 11.2, 12.2, 13.2, 14.2, 15.2,

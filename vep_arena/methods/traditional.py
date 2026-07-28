@@ -8,6 +8,8 @@ import numpy as np
 
 from vep_arena.config import BenchmarkSpec
 from vep_arena.data.benchmark import reference_signals
+from vep_arena.methods.ecca import ECCA
+from vep_arena.methods.sscor import SSCOR
 from vep_arena.methods.trca_core import corr_flat as _corr_flat
 from vep_arena.methods.trca_core import trca_filter as _trca_filter
 from vep_arena.methods.trca_core import trca_scores
@@ -15,6 +17,34 @@ from vep_arena.methods.trca_core import trca_scores
 
 def filterbank_weights(n_fbs: int) -> np.ndarray:
     return np.asarray([(idx + 1) ** (-1.25) + 0.25 for idx in range(n_fbs)], dtype=np.float64)
+
+
+def multi_frequency_reference_signals(
+    target_frequencies: tuple[tuple[float, ...], ...] | list[tuple[float, ...]],
+    samples: int,
+    fs: int,
+    harmonics: int = 5,
+    target_phases_pi: tuple[tuple[float, ...], ...] | list[tuple[float, ...]] | None = None,
+) -> list[np.ndarray]:
+    """Build sine/cosine CCA references for one or more frequencies per class.
+
+    A dual-frequency target is represented by concatenating the harmonic
+    sin/cos rows for both frequencies, matching the public binocular AR and
+    Dual-Alpha reference implementations.
+    """
+
+    t = np.linspace(0, (samples - 1) / fs, samples)[None, :]
+    refs: list[np.ndarray] = []
+    for cls, freqs in enumerate(target_frequencies):
+        phases = target_phases_pi[cls] if target_phases_pi is not None else tuple(0.0 for _ in freqs)
+        rows = []
+        for h in range(1, harmonics + 1):
+            for freq, phase_pi in zip(freqs, phases):
+                phase = float(phase_pi) * np.pi
+                rows.append(np.sin(2 * np.pi * h * float(freq) * t + h * phase))
+                rows.append(np.cos(2 * np.pi * h * float(freq) * t + h * phase))
+        refs.append(np.concatenate(rows, axis=0))
+    return refs
 
 
 def _center_rows(x: np.ndarray) -> np.ndarray:
@@ -50,11 +80,12 @@ class CCA:
         spec: BenchmarkSpec | None = None,
         frequencies: tuple[float, ...] | list[float] | None = None,
         phases_pi: tuple[float, ...] | list[float] | None = None,
+        references: list[np.ndarray] | tuple[np.ndarray, ...] | None = None,
     ) -> None:
-        self.refs_q = [
-            _orth_rows(ref)
-            for ref in reference_signals(window, harmonics, spec, frequencies=frequencies, phases_pi=phases_pi)
-        ]
+        refs = references if references is not None else reference_signals(
+            window, harmonics, spec, frequencies=frequencies, phases_pi=phases_pi
+        )
+        self.refs_q = [_orth_rows(ref) for ref in refs]
 
     def fit(self, train_x: np.ndarray, train_y: np.ndarray) -> "CCA":
         return self
@@ -85,12 +116,15 @@ class FBCCA:
         spec: BenchmarkSpec | None = None,
         frequencies: tuple[float, ...] | list[float] | None = None,
         phases_pi: tuple[float, ...] | list[float] | None = None,
+        references: list[np.ndarray] | tuple[np.ndarray, ...] | None = None,
+        square_scores: bool = False,
     ) -> None:
-        self.refs_q = [
-            _orth_rows(ref)
-            for ref in reference_signals(window, harmonics, spec, frequencies=frequencies, phases_pi=phases_pi)
-        ]
+        refs = references if references is not None else reference_signals(
+            window, harmonics, spec, frequencies=frequencies, phases_pi=phases_pi
+        )
+        self.refs_q = [_orth_rows(ref) for ref in refs]
         self.weights = filterbank_weights(n_fbs)
+        self.square_scores = bool(square_scores)
 
     def fit(self, train_x: np.ndarray, train_y: np.ndarray) -> "FBCCA":
         return self
@@ -101,6 +135,8 @@ class FBCCA:
             for fb_idx, band in enumerate(trial):
                 for cls, ref_q in enumerate(self.refs_q):
                     scores_by_band[trial_idx, fb_idx, cls] = _cca_corr(band, ref_q)
+        if self.square_scores:
+            scores_by_band = scores_by_band**2
         scores = np.einsum("f,tfc->tc", self.weights[: x.shape[1]], scores_by_band)
         return np.argmax(scores, axis=1), scores
 

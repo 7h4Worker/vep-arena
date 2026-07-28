@@ -6,6 +6,8 @@
     "ssvep_wearable": "D:/ProjData/datasets/ssvep_wearable",
     "ssvep_nakanishi_12jfpm": "D:/ProjData/datasets/ssvep_nakanishi_12jfpm",
     "ssvep_hd_200target": "D:/ProjData/datasets/ssvep_hd_200target",
+    "ssvep_dual_alpha_gigadb_102557": "D:/ProjData/datasets/ssvep_dual_alpha_gigadb_102557",
+    "ssvep_binocular_ar": "D:/ProjData/datasets/ssvep_binocular_ar",
     "ssvep_spatial_chen2017": "D:/ProjData/datasets/ssvep_spatial_chen2017",
     "cvep_thielen2021": "D:/ProjData/datasets/cvep_thielen2021",
     "cvep_castillos100": "D:/ProjData/datasets/cvep_castillos100",
