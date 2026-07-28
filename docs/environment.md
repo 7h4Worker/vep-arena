@@ -1,10 +1,30 @@
 # Environment Strategy
 
-## Two-layer design
+## Canonical local environment
 
-VEP Arena uses optional dependency groups instead of per-model virtual
-environments.  All code lives in one repo; environments differ only in which
-extras are installed.
+VEP Arena uses the repository `.venv` as the canonical local execution
+environment for agents and task scripts:
+
+```powershell
+D:\ProjData\proj_python\vep_arena\.venv\Scripts\python.exe
+```
+
+Keep it synchronized from `pyproject.toml` and `uv.lock`:
+
+```powershell
+cd D:\ProjData\proj_python\vep_arena
+uv sync --extra all
+.venv\Scripts\python.exe scripts\check_neuro_env.py
+```
+
+Do not use bare `python` for official runs. Commands should either call the
+`.venv` interpreter explicitly or go through a documented wrapper.
+
+## Dependency groups
+
+The project uses optional dependency groups instead of per-model virtual
+environments. All code lives in one repo; extras only control which dependency
+families are installed.
 
 ### Layer 1 — core (default)
 
@@ -14,8 +34,8 @@ Traditional algorithms, data loading, plotting, artifact audit.
 uv sync              # numpy/scipy/sklearn/pandas/matplotlib/h5py/…
 ```
 
-Runs: CCA, FBCCA, TRCA, TDCA, MVMD, SA-MVMD, all data loaders, all report
-and plotting scripts.
+Runs: CCA, FBCCA, TRCA, TDCA, MVMD, SA-MVMD, all data loaders, and plotting
+scripts.
 
 ### Layer 2 — torch
 
@@ -40,10 +60,20 @@ uv sync --extra neuro   # adds mne>=1.8, moabb>=1.1
 Runs: `make_benchmark_mne_qa.py`, `check_neuro_env.py`, and scripts under
 `vep_arena.neuroviz`.
 
+### Layer 2 — reports (optional)
+
+PowerPoint/report helper dependencies.
+
+```
+uv sync --extra reports   # adds python-pptx and its dependencies
+```
+
+Runs: `generate_hd200_ppt.py` and other local report-generation helpers.
+
 ### Full install
 
 ```
-uv sync --extra all     # core + torch + neuro
+uv sync --extra all     # core + torch + neuro + reports
 ```
 
 ## Migration from per-repo venvs
@@ -65,11 +95,12 @@ and provenance for imported results, but no new development happens there.
 Scripts like `import_dnn_results.py` and `build_report.py` still reference
 sibling result CSVs for historical comparison; this is intentional.
 
-## Existing shared environment
+## Legacy conda environment
 
 `D:\ProjData\envs\erp_ssvep_lab` (Python 3.10, conda) has MNE 1.12.1 and
-PsychoPy.  It can continue to serve as the neuroscience QA environment until
-MNE is confirmed working inside the Arena venv via `--extra neuro`.
+PsychoPy. MNE is now available in the Arena `.venv`, so this conda environment
+is no longer the default for Arena task execution. Keep it as a legacy
+PsychoPy/online-experiment fallback unless a task explicitly requires it.
 
 ## Arena-native training scripts
 
@@ -90,7 +121,7 @@ Smoke tasks under `tasks/benchmark_*_smoke/` validate each pipeline with
 
 ## Cleaning up sibling venvs
 
-Once Arena is confirmed working (`uv sync --extra torch` + smoke tests pass),
+Once Arena is confirmed working (`uv sync --extra all` + smoke tests pass),
 the sibling repo `.venv` directories can be deleted to reclaim ~29 GB:
 
 ```bash

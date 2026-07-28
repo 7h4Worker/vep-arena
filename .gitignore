@@ -14,16 +14,19 @@ __pycache__/
 # Arena generated artifacts
 results/
 runs/
-成果汇总/
+# Local result bundles
 tasks/**/results/**
 !tasks/**/results/
 !tasks/**/results/.gitkeep
+tasks/**/analysis/**/figures/**
+tasks/**/analysis/**/tables/**
 
 # Large/raw data and binary documents kept outside source control
 /data/
 /datasets/
 configs/datasets/local_paths.json
 docs/papers/
+docs/ppt_figures/
 docs/paper_notes/**/full_text.txt
 docs/paper_notes/**/page_*.txt
 *.mat

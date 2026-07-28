@@ -1,0 +1,32 @@
+VEP Arena 本地环境要求
+最后更新：2026-07-09
+
+统一 Python：
+  D:\ProjData\proj_python\vep_arena\.venv\Scripts\python.exe
+
+依赖来源：
+  pyproject.toml
+  uv.lock
+
+安装或修复：
+  cd D:\ProjData\proj_python\vep_arena
+  uv sync --extra all
+
+环境检查：
+  .venv\Scripts\python.exe scripts\check_neuro_env.py
+  .venv\Scripts\python.exe -c "import mne, torch, pptx; print(mne.__version__, torch.__version__)"
+
+依赖组：
+  core    NumPy、SciPy、scikit-learn、pandas、matplotlib、h5py 与数据加载器
+  torch   DNN、SSVEPFormer、TRCANet 使用的 PyTorch CUDA 运行时
+  neuro   EEG 质量检查、FIR、topomap 与数据集桥接所需的 MNE/MOABB
+  reports 本地 PPT/报告工具所需的 python-pptx
+
+执行纪律：
+  正式运行不得使用裸 python。
+  不得静默使用近似后端替换公开代码指定后端。
+  tasks/**/results/** 与 results/** 下的结果只保留在本地，并由 Git 忽略。
+
+历史环境：
+  D:\ProjData\envs\erp_ssvep_lab
+  仅在 task 明确需要 PsychoPy/在线实验时作为备用，不作为 Arena 默认解释器。
