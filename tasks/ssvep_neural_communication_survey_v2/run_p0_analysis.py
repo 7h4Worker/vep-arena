@@ -156,8 +156,11 @@ def main() -> None:
     w075_sha = sha256_file(args.w075_predictions)
     unified = load_unified_predictions(args.full_v2_predictions, args.w075_predictions)
     source_by_window = {
-        **{window: {"run": "benchmark_decision_channel_capacity_full_v2", "sha256": full_sha} for window in FULL_V2_WINDOWS},
-        0.75: {"run": "benchmark_p0_w075_20260729", "sha256": w075_sha},
+        **{
+            window: {"run": args.full_v2_predictions.parent.name, "sha256": full_sha}
+            for window in FULL_V2_WINDOWS
+        },
+        0.75: {"run": args.w075_predictions.parent.name, "sha256": w075_sha},
     }
     results, subjects, confusion_payload = analyze_predictions(unified, source_by_window)
 
