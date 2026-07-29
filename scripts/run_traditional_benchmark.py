@@ -534,6 +534,12 @@ def main() -> None:
     parser.add_argument("--harmonics", type=int, default=5)
     parser.add_argument("--n-fbs", type=int, default=5)
     parser.add_argument("--epoch-cache", type=Path, default=RUN_ROOT / "canonical_epochs")
+    parser.add_argument(
+        "--cache-window",
+        type=float,
+        default=None,
+        help="Filter/cache this duration before slicing requested windows (default: max requested window).",
+    )
     parser.add_argument("--force-epochs", action="store_true")
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--save-score-matrices", action="store_true")
@@ -547,7 +553,9 @@ def main() -> None:
     subjects = parse_range(args.subjects)
     blocks = parse_range(args.blocks)
     windows = parse_windows(args.windows)
-    cache_window = max(windows)
+    cache_window = float(args.cache_window) if args.cache_window is not None else max(windows)
+    if cache_window < max(windows):
+        raise ValueError("--cache-window must be at least the largest requested window.")
     methods = method_names(args.methods)
     result_dir = PROJECT_ROOT / "results" / args.task_name
     run_dir = RUN_ROOT / args.task_name
