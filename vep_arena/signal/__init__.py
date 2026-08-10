@@ -7,6 +7,7 @@ package which works on confusion matrices.
 """
 
 from vep_arena.signal.spectrum import amplitude_spectrum, compute_psd
+from vep_arena.signal.filters import powerline_comb_filter, remove_dc, target_band_comb_filter
 from vep_arena.signal.snr import (
     snr_harmonic,
     snr_narrowband,
@@ -31,11 +32,14 @@ __all__ = [
     "kl_divergence",
     "pearson_batch",
     "plv_profile",
+    "powerline_comb_filter",
     "rayleigh_test",
+    "remove_dc",
     "safe_log2",
     "snr_harmonic",
     "snr_narrowband",
     "snr_wideband",
     "spectral_concentration",
     "ssvep_snr_profile",
+    "target_band_comb_filter",
 ]

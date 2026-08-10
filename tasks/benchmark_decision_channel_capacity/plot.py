@@ -453,9 +453,13 @@ def write_report(
 
 
 def main() -> None:
+    global FIGURES
     parser = argparse.ArgumentParser()
     parser.add_argument("--analysis-dir", type=Path, default=ANALYSIS)
+    parser.add_argument("--figures-dir", type=Path, default=FIGURES)
+    parser.add_argument("--skip-report", action="store_true")
     args = parser.parse_args()
+    FIGURES = args.figures_dir
     FIGURES.mkdir(parents=True, exist_ok=True)
     capacity = pd.read_csv(args.analysis_dir / "capacity_by_subject_method_window.csv")
     aggregate = pd.read_csv(args.analysis_dir / "capacity_by_method_window_aggregate.csv")
@@ -478,7 +482,8 @@ def main() -> None:
     plot_costa_selection_path(costa_path_df, costa_best)
     plot_costa_selected_frequencies(costa_best)
     plot_costa_gain_heatmap(pruning)
-    write_report(capacity, aggregate, best_method, best_window, pruning, costa_best)
+    if not args.skip_report:
+        write_report(capacity, aggregate, best_method, best_window, pruning, costa_best)
     print(FIGURES)
 
 

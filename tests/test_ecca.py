@@ -1,6 +1,7 @@
 import numpy as np
+from scipy.linalg import qr
 
-from vep_arena.methods.ecca import ECCA, cca_filters, ecca_scores
+from vep_arena.methods.ecca import ECCA, _center_rows, _ged_filters, cca_filters, ecca_scores
 
 
 def _toy_epochs(seed: int = 0) -> tuple[np.ndarray, np.ndarray]:
@@ -36,6 +37,23 @@ def test_cca_filters_project_correlated_signals() -> None:
     assert wy.shape == (4, 1)
     assert np.all(np.isfinite(wx))
     assert np.all(np.isfinite(wy))
+
+
+def test_ged_basis_matches_explicit_projector() -> None:
+    rng = np.random.default_rng(17)
+    x = _center_rows(rng.normal(size=(9, 125)))
+    y = _center_rows(rng.normal(size=(6, 125)))
+    q, _ = qr(y.T, mode="economic")
+    z = x.T
+    projector = q @ q.T
+    projected = projector.T @ z
+    legacy_a = projected.T @ projected
+    fast_projected = q.T @ z
+    fast_a = fast_projected.T @ fast_projected
+
+    np.testing.assert_allclose(fast_a, legacy_a, rtol=1e-11, atol=1e-11)
+    filters = _ged_filters(z, q, n_components=2)
+    assert filters.shape == (x.shape[0], 2)
 
 
 def test_ecca_fit_predict_shape_and_3d_input() -> None:

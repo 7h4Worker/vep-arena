@@ -1,0 +1,16 @@
+{
+  "dataset": "jbhi35",
+  "subjects": [
+    "S03",
+    "S06"
+  ],
+  "window_seconds": 0.2,
+  "filter_bands": 5,
+  "method": "ETRCA",
+  "scoring_rules": [
+    "signed_correlation",
+    "absolute_correlation"
+  ],
+  "split": "subject-specific six-fold leave-one-block-out",
+  "runtime_latency_offset_seconds": 0.0
+}

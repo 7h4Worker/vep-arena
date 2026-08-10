@@ -1,0 +1,49 @@
+{
+  "dataset_config_key": "ssvep_jbhi_35target_five_subject_reproduction_private",
+  "subject_manifest_config_key": "ssvep_jbhi_35target_five_subject_manifest_private",
+  "subjects": [
+    "S01",
+    "S03",
+    "S04",
+    "S05",
+    "S06"
+  ],
+  "window_seconds": 2.0,
+  "filter_bands": 5,
+  "split": "subject-specific six-fold leave-one-block-out",
+  "scoring_variants": [
+    "arena_independent_signed",
+    "arena_independent_absolute",
+    "legacy_matlab_signed",
+    "legacy_matlab_absolute"
+  ],
+  "tdca_windows_seconds": [
+    0.2,
+    0.4,
+    0.6,
+    0.8,
+    1.0,
+    1.2,
+    1.4,
+    1.6,
+    1.8,
+    2.0
+  ],
+  "tdca_reference_variants": [
+    "EEG_TDCA",
+    "SPECTRAL_TDCA"
+  ],
+  "tdca_filter_bands": 5,
+  "tdca_harmonics": 3,
+  "tdca_n_delay": 2,
+  "tdca_n_components": 4,
+  "target_frequency_pairs_hz": [
+    [13, 15], [0, 14], [11, 15], [14, 12], [15, 11],
+    [11, 12], [12, 12], [0, 13], [12, 14], [13, 0],
+    [14, 13], [15, 14], [11, 11], [0, 15], [14, 11],
+    [12, 11], [15, 12], [13, 13], [12, 0], [13, 11],
+    [13, 14], [0, 11], [14, 0], [15, 15], [14, 15],
+    [15, 0], [0, 12], [12, 13], [11, 0], [13, 12],
+    [11, 13], [11, 14], [15, 13], [14, 14], [12, 15]
+  ]
+}

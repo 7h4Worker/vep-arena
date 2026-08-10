@@ -14,12 +14,23 @@ __pycache__/
 # Arena generated artifacts
 results/
 runs/
+outputs/
 成果汇总/
 tasks/**/results/**
 !tasks/**/results/
 !tasks/**/results/.gitkeep
 tasks/**/analysis/**/figures/**
 tasks/**/analysis/**/tables/**
+
+# Task-level generated figures/tables (wherever they land)
+tasks/**/figures/**
+tasks/**/figures_*/**
+tasks/**/tables/**
+
+# Temporary exploration files
+tasks/**/_*.csv
+tasks/**/_*.txt
+tmp/
 
 # Task source is versionable; generated outputs remain ignored above.
 !tasks/_legacy/

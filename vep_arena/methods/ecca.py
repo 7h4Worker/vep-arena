@@ -66,9 +66,11 @@ def _safe_corr(a: np.ndarray, b: np.ndarray) -> float:
     return float(np.clip((av @ bv) / denom, -1.0, 1.0))
 
 
-def _ged_filters(z: np.ndarray, projection: np.ndarray, n_components: int) -> np.ndarray:
-    a = projection.T @ z
-    a = a.T @ a
+def _ged_filters(z: np.ndarray, basis: np.ndarray, n_components: int) -> np.ndarray:
+    # For the orthogonal projector P = QQ.T, (Pz).T(Pz) is exactly
+    # (Q.Tz).T(Q.Tz).  Keeping Q avoids an O(samples^2) projector.
+    projected = basis.T @ z
+    a = projected.T @ projected
     b = z.T @ z
     reg = 1e-8 * max(float(np.trace(b)) / max(b.shape[0], 1), 1.0)
     b = b + np.eye(b.shape[0], dtype=np.float64) * reg
@@ -97,8 +99,7 @@ def cca_filters(x: np.ndarray, y: np.ndarray, n_components: int = 1) -> tuple[np
     if n_components > components:
         raise ValueError("n_components exceeds the available CCA rank.")
     q, r = qr(y_c.T, mode="economic")
-    projection = q @ q.T
-    wx = _ged_filters(x_c.T, projection, components)
+    wx = _ged_filters(x_c.T, q, components)
     wy = pinv(r) @ q.T @ x_c.T @ wx
     return wx[:, :n_components], wy[:, :n_components]
 

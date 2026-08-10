@@ -99,9 +99,11 @@ def main() -> None:
     parser.add_argument("--pruning-max-size", type=int, default=None)
     parser.add_argument("--pruning-ba-tol", type=float, default=1e-5)
     parser.add_argument("--skip-pruning", action="store_true")
+    parser.add_argument("--output-dir", type=Path, default=ANALYSIS)
     args = parser.parse_args()
 
-    ANALYSIS.mkdir(parents=True, exist_ok=True)
+    analysis_dir = args.output_dir
+    analysis_dir.mkdir(parents=True, exist_ok=True)
     preds = pd.read_csv(args.predictions)
     required = {"method", "window", "subject", "true", "pred"}
     missing = sorted(required - set(preds.columns))
@@ -145,17 +147,17 @@ def main() -> None:
         row.update({"method": method, "window": float(window), "subject": "all"})
         aggregate_rows.append(row)
 
-    np.savez_compressed(ANALYSIS / "confusion_counts_subject_method_window.npz", **counts_payload)
-    np.savez_compressed(ANALYSIS / "confusion_counts_method_window_aggregate.npz", **aggregate_payload)
-    pd.DataFrame(index_rows).to_csv(ANALYSIS / "confusion_index.csv", index=False)
+    np.savez_compressed(analysis_dir / "confusion_counts_subject_method_window.npz", **counts_payload)
+    np.savez_compressed(analysis_dir / "confusion_counts_method_window_aggregate.npz", **aggregate_payload)
+    pd.DataFrame(index_rows).to_csv(analysis_dir / "confusion_index.csv", index=False)
     pd.DataFrame(capacity_rows).sort_values(["method", "window", "subject"]).to_csv(
-        ANALYSIS / "capacity_by_subject_method_window.csv", index=False
+        analysis_dir / "capacity_by_subject_method_window.csv", index=False
     )
     pd.DataFrame(aggregate_rows).sort_values(["method", "window"]).to_csv(
-        ANALYSIS / "capacity_by_method_window_aggregate.csv", index=False
+        analysis_dir / "capacity_by_method_window_aggregate.csv", index=False
     )
     pd.DataFrame(q_rows).sort_values(["method", "window", "subject", "class"]).to_csv(
-        ANALYSIS / "qstar_by_class.csv", index=False
+        analysis_dir / "qstar_by_class.csv", index=False
     )
 
     if not args.skip_pruning:
@@ -231,15 +233,15 @@ def main() -> None:
                     }
                 )
         pd.DataFrame(pruning_rows).sort_values(["method", "window"]).to_csv(
-            ANALYSIS / "codebook_pruning_by_method_window.csv", index=False
+            analysis_dir / "codebook_pruning_by_method_window.csv", index=False
         )
         path_df = pd.DataFrame(path_rows).sort_values(["method", "window", "size"])
         path_df.to_csv(
-            ANALYSIS / "codebook_pruning_path.csv", index=False
+            analysis_dir / "codebook_pruning_path.csv", index=False
         )
-        path_df.to_csv(ANALYSIS / "costa_selection_path.csv", index=False)
+        path_df.to_csv(analysis_dir / "costa_selection_path.csv", index=False)
         pd.DataFrame(best_rows).sort_values(["method", "window"]).to_csv(
-            ANALYSIS / "costa_best_codebooks.csv", index=False
+            analysis_dir / "costa_best_codebooks.csv", index=False
         )
 
     manifest = {
@@ -256,8 +258,8 @@ def main() -> None:
         "pruning_ba_tol": args.pruning_ba_tol,
         "frequencies_hz": list(BENCHMARK_FREQS[: spec.classes]),
     }
-    (ANALYSIS / "analysis_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
-    print(ANALYSIS)
+    (analysis_dir / "analysis_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    print(analysis_dir)
 
 
 if __name__ == "__main__":
