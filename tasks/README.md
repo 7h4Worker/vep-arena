@@ -1,98 +1,37 @@
 # Tasks
 
-Tasks are concrete research or validation questions. A task owns its runnable
-entry points, notes, and generated results.
-
-Current task root layout:
+任务按主题组织，每个类别下的目录以 `{类别ID}_{内容}` 命名。
 
 ```text
 tasks/
-  ╔══════════════════════════════════════════════════════════════════════╗
-  ║  DECISION CHANNEL (DISCRETE DMC / BLAHUT-ARIMOTO)                  ║
-  ╚══════════════════════════════════════════════════════════════════════╝
-  benchmark_decision_channel_capacity/         Benchmark 40-target DMC
-    └── results/extended/multichannel/         (multichannel sweep lives here)
-  benchmark_multichannel_decision_channel_capacity/  Scripts-only; outputs → above
-  ssvep_hd_200target_tdca_sample/              HD200 DMC (14sub × 5tgt × 4ch × 5win)
-  ssvep_jbhi_decision_channel/                 Cross-paradigm DMC envelope + comparison
-
-  ╔══════════════════════════════════════════════════════════════════════╗
-  ║  CONTINUOUS CHANNEL (MIMO / GAUSSIAN MI) — NEW                     ║
-  ╚══════════════════════════════════════════════════════════════════════╝
-  continuous_mimo_channel_capacity/            Signal-level MIMO MI analysis
-  benchmark_signal_channel_analysis/           Early exploration (frozen)
-
-  ╔══════════════════════════════════════════════════════════════════════╗
-  ║  PARADIGM BASELINES & VALIDATION                                    ║
-  ╚══════════════════════════════════════════════════════════════════════╝
-  beta_ssvep_9ch_baselines/                    Benchmark 9ch baseline grid
-  beta_ssvep_9ch_official_grid/                Benchmark 9ch official reproduction
-  ssvep_benchmark_9ch_feature_analysis/        Benchmark signal feature probes
-  ssvep_binocular_ar_trca/                     Binocular AR TRCA (3 experiments)
-  ssvep_binocular_dataset_smoke/               Binocular dataset smoke test
-  ssvep_dual_alpha_baselines/                  Dual-alpha ETRCA/FBDCCA baselines
-  ssvep_dual_frequency_phase_liang2020/        Dual-freq phase (Liang 2020)
-  ssvep_efficient_dual_frequency_sun2024/      Efficient dual-freq (Sun 2024)
-  ssvep_embc_9target_baselines/                EMBC 9-target baselines
-  ssvep_jbhi_16target_baselines/               JBHI 16-target baselines
-  ssvep_jbhi_35target_baselines/               JBHI 35-target baselines
-  cvep_nbrs_jfpm_tsinghua_2024_baselines/      cVEP JFPM coding baselines
-  cvep_broadband_white_noise_tdca/             Broadband WN cVEP TDCA
-  ssvep_160target_mfsc_tdca/                   160-target MFSC TDCA
-
-  ╔══════════════════════════════════════════════════════════════════════╗
-  ║  CROSS-CUTTING ANALYSES                                             ║
-  ╚══════════════════════════════════════════════════════════════════════╝
-  crossparadigm_information_efficiency/        Info-efficiency meta-analysis
-  information_accumulation_rate/               dI/dT accumulation rate
-  ssvep_embc_jbhi_binocular_codebook_analysis/ Codebook structure analysis
-  ssvep_embc_jbhi_fft_features/                FFT feature comparison
-  ssvep_embc_jbhi_receiver_matrix/             Receiver capability matrix
-
-  _legacy/                                     Archived historical tasks
+├── baselines/                              公开数据集评估
+│   ├── BL01_ssvep_benchmark/               Tsinghua Benchmark 40t (Wang 2017)
+│   ├── BL02_ssvep_beta_9ch/                BETA 9ch 标准基线
+│   ├── BL03_ssvep_beta_official_grid/      BETA 官方窗口网格
+│   ├── BL04_ssvep_mfsc_160t/              160 目标 MFSC (Chen 2021)
+│   ├── BL05_ssvep_hd_200t/                HD 200 目标 TDCA/TRCA
+│   ├── BL06_ssvep_binocular_ar/           双目 AR SSVEP (Ke 2025)
+│   ├── BL07_ssvep_binocular_smoke/        双目数据集 QA
+│   ├── BL08_ssvep_dual_alpha/             Dual-Alpha 三范式
+│   ├── BL09_ssvep_dual_freq_liang2020/    Liang 双频相位
+│   ├── BL10_ssvep_dual_freq_sun2024/      Sun 双频
+│   ├── BL11_cvep_wn_tdca/                 WN-BCI cVEP TDCA
+│   └── BL12_cvep_nbrs_jfpm/              NBRS/JFPM cVEP
+│
+├── _legacy/                                已归档历史任务
+└── _shared/                                跨任务共享模块（待建）
 ```
 
-The package under `vep_arena/` stays reusable:
+## 目录规范
 
-```text
-vep_arena/data/       dataset adapters and metadata
-vep_arena/methods/    algorithm modules
-vep_arena/plots/      shared plotting primitives
-vep_arena/neuroviz/   MNE-oriented views
-```
+每个任务目录包含：
+- `run.py` — 主运行入口
+- `README.md` — 任务说明
+- `results/` — 本地产出（gitignored）
 
-Each task should be small and readable:
+命名：`{类别ID}_{内容}`，如 `BL01_ssvep_benchmark`。
 
-```text
-tasks/<dataset>_<scope>_<purpose>/
-  README.md
-  run.py
-  plot_acc_itr.py
-  results/
-```
+## 清理规范
 
-Naming convention:
-
-- `run.py`: runs the task's main experiment.
-- `plot_<view>.py`: builds a task-specific figure from existing outputs.
-- `results/`: local outputs owned by the task. This directory is ignored by
-  default to prevent accidental commits of predictions, caches, and large logs.
-
-Large datasets and external toolboxes stay outside the repository.
-
-## Cleanup convention
-
-When a smoke run, partial run, or superseded result is no longer the current
-analysis source, keep it under the owning task's `results/_legacy/` directory
-instead of deleting it. Add a date-stamped note such as `NOTES_YYYYMMDD.md` in
-the task root explaining:
-
-- which result directories are current,
-- what issue was validated or fixed,
-- which outputs were moved to `_legacy`,
-- which outputs should feed the next report or analysis step.
-
-When a whole task folder is historical rather than a current workstream, move
-it under `tasks/_legacy/YYYYMMDD_<reason>/` and add a short README in that
-legacy folder. Do not move current report/task roots merely because their
-`results/` are ignored by git.
+- 过期结果移入任务自身的 `results/_legacy/`，附 `NOTES_YYYYMMDD.md`
+- 过期任务整体移入 `tasks/_legacy/YYYYMMDD_reason/`
