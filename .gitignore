@@ -3,6 +3,8 @@
 *.egg-info/
 .env
 .env.*
+README_zh.md
+notes/
 
 # Python caches
 __pycache__/
