@@ -11,7 +11,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from tasks.ssvep_efficient_dual_frequency_sun2024.run_comb_candidates import (  # noqa: E402
+from tasks.baselines.BL10_ssvep_dual_freq_sun2024.run_comb_candidates import (  # noqa: E402
     BASELINE_BANDS,
     FS,
     build_pair_specs,

@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 TASK = Path(__file__).resolve().parent
-PROJECT = TASK.parents[1]
+PROJECT = TASK.parents[3]
 PYTHON = PROJECT / ".venv" / "Scripts" / "python.exe"
 SCRIPT = PROJECT / "scripts" / "evaluate_trcanet.py"
 OUTPUT = TASK / "results" / "trcanet_smoke"

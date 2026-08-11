@@ -17,7 +17,7 @@ from scipy.linalg import eig, qr
 from scipy.signal import cheb1ord, cheby1, filtfilt
 
 
-PROJECT = Path(__file__).resolve().parents[2]
+PROJECT = Path(__file__).resolve().parents[5]
 DEFAULT_DATASET = Path(r"D:\ProjData\datasets\ssvep_hd_200target")
 RAW_REL = Path(r"raw\code_data\code&data")
 FS = 250
