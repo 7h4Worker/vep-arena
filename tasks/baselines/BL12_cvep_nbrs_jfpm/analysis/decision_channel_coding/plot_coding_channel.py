@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 from scipy.io import loadmat
 
-PROJECT = Path(__file__).resolve().parents[4]
+PROJECT = Path(__file__).resolve().parents[5]
 sys.path.insert(0, str(PROJECT))
 
 from vep_arena.channel.capacity import capacity_ba, capacity_c0, capacity_c1, mutual_info_uniform
