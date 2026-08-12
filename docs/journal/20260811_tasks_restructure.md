@@ -97,6 +97,35 @@ tasks/ 目录从 25+ 扁平目录重组为 4 个主题分类，解决命名混�
 
 分析脚本现在通过 `TASK / "results" / "BS02_16t" / ...` 访问 baseline 结果，纯相对路径。
 
+## 冒烟测试与修复（2026-08-12）
+
+对所有 tasks/ 下 66 个 `parents[N]` 路径引用进行自动化冒烟测试，发现 11 处错误 + 1 处旧 import 路径：
+
+| 类型 | 数量 | 原因 |
+|------|------|------|
+| `analysis/` 子目录 `parents[4]→[5]` | 4 | 重组 +1 层但 sed 模式只覆盖 `parents[2]` |
+| `_legacy/` 深层嵌套 `parents[2]→[5]` | 4 | 搬入 _legacy 时已断裂，重组加深 |
+| `tasks/_legacy/` 历史遗留 `TASK.parents[1]→[3]` | 3 | 重组前即已错误 |
+| 旧 import 路径 `tasks.ssvep_efficient_...` | 1 | hardcoded grep 未覆盖 import 语句 |
+
+全部修复后重测通过。修复已同步到 main 和 feature/tasks-restructure-baselines 分支。
+
+## 测试整理（2026-08-12）
+
+tests/ 中 7 个测试文件按归属重新组织：
+
+| 文件 | 归属 | 处理 |
+|------|------|------|
+| test_sscor.py | `vep_arena.methods` 库 | 留 tests/ |
+| test_ecca.py | `vep_arena.methods` 库 | 留 tests/ |
+| test_bprca.py | `vep_arena.methods` 库 | 留 tests/ |
+| test_channel_capacity.py | `vep_arena.channel` 库 | 留 tests/ |
+| test_embc_jbhi_data.py | `vep_arena.data` 库 | 留 tests/，修 2 处旧路径 |
+| test_benchmark_multichannel_task.py | CH02 专属 | → `channel/CH02_dmc_multichannel/test_task.py` |
+| test_extended_runner.py | CH01 专属 | → `channel/CH01_dmc_benchmark/test_runner.py` |
+
+移入 task 后路径简化（`Path(__file__).resolve().parent` 即 task 根），全套 32 tests passed。
+
 ## 待处理
 
 - theory 分支 `feat/theory-p0-p2-survey-v2` 中的 `survey_v2` 任务待合入 `channel/CH08_survey_p0p1/`
