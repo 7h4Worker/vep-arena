@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 from scipy import signal
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from vep_arena.config import BENCHMARK_FREQS, PROJECT_ROOT, RUN_ROOT
 from vep_arena.data.epochs import CanonicalEpochStore, EpochRequest, epoch_fingerprint

@@ -5,7 +5,7 @@ from pathlib import Path
 from vep_arena.plots.comparison_curves import AccItrPlotSpec, load_summaries, plot_acc_itr
 
 
-PROJECT = Path(__file__).resolve().parents[1]
+PROJECT = Path(__file__).resolve().parents[3]
 RESULTS = PROJECT / "results"
 OUT = RESULTS / "beta_toolbox_official_grid_compare"
 SOURCES = [
