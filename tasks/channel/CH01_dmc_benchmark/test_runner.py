@@ -6,12 +6,7 @@ from pathlib import Path
 import pandas as pd
 
 
-MODULE_PATH = (
-    Path(__file__).resolve().parents[1]
-    / "tasks"
-    / "benchmark_decision_channel_capacity"
-    / "run_extended.py"
-)
+MODULE_PATH = Path(__file__).resolve().parent / "run_extended.py"
 SPEC = importlib.util.spec_from_file_location("benchmark_run_extended", MODULE_PATH)
 assert SPEC is not None and SPEC.loader is not None
 run_extended = importlib.util.module_from_spec(SPEC)

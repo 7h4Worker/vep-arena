@@ -8,7 +8,7 @@ import pandas as pd
 import pytest
 
 
-TASK_ROOT = Path(__file__).resolve().parents[1] / "tasks" / "benchmark_multichannel_decision_channel_capacity"
+TASK_ROOT = Path(__file__).resolve().parent
 if str(TASK_ROOT) not in sys.path:
     sys.path.insert(0, str(TASK_ROOT))
 
