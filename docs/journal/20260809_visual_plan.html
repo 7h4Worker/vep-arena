@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>VEP Arena — 提交整理可视化</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+  body { font-family: "Microsoft YaHei", sans-serif; background: #1a1a2e; color: #e0e0e0; margin: 2rem auto; max-width: 1100px; }
+  h1 { color: #e94560; border-bottom: 2px solid #e94560; padding-bottom: 0.5rem; }
+  h2 { color: #0f3460; background: #e0e0e0; padding: 0.4rem 1rem; border-radius: 4px; margin-top: 2.5rem; }
+  .mermaid { background: #16213e; border-radius: 8px; padding: 1.5rem; margin: 1rem 0; }
+  .note { background: #0f3460; padding: 1rem; border-radius: 6px; border-left: 4px solid #e94560; margin: 1rem 0; font-size: 0.95rem; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+  th { background: #0f3460; padding: 0.5rem; text-align: left; }
+  td { border: 1px solid #333; padding: 0.5rem; }
+  tr:nth-child(even) { background: #16213e; }
+</style>
+</head>
+<body>
+
+<h1>提交整理与 PR 组织 — 可视化总览</h1>
+
+<h2>图 1：C1-C7 依赖链</h2>
+<div class="note">箭头表示"依赖"：C3 需要 C1 的数据加载器和 C2 的方法模块才能运行。</div>
+<pre class="mermaid">
+graph LR
+    C1["C1<br/>数据加载器<br/><i>data/new-dataset-loaders</i>"]
+    C2["C2<br/>双目接收器方法<br/><i>feature/binocular-receivers</i>"]
+    C3["C3<br/>Baseline 任务批量<br/><i>experiment/baseline-tasks-batch</i>"]
+    C4["C4<br/>EMBC/JBHI 码本分析<br/><i>experiment/embc-jbhi-codebook</i>"]
+    C5["C5<br/>Benchmark DMC 扩展<br/><i>experiment/benchmark-dmc-extended</i>"]
+    C6["C6<br/>跨范式容量分析链<br/><i>experiment/crossparadigm-capacity</i>"]
+    C7["C7<br/>文档与约定<br/><i>docs/conventions-update</i>"]
+
+    C1 --> C2
+    C1 --> C3
+    C2 --> C3
+    C3 --> C4
+    C3 --> C5
+    C5 --> C6
+    C4 --> C6
+    C7 ~~~ C1
+
+    style C1 fill:#1b4332,stroke:#2d6a4f,color:#fff
+    style C2 fill:#1b4332,stroke:#2d6a4f,color:#fff
+    style C3 fill:#003566,stroke:#0077b6,color:#fff
+    style C4 fill:#3c1361,stroke:#6a1b9a,color:#fff
+    style C5 fill:#003566,stroke:#0077b6,color:#fff
+    style C6 fill:#5c2018,stroke:#e94560,color:#fff
+    style C7 fill:#333,stroke:#888,color:#ccc
+</pre>
+
+<h2>图 2：Git 分支与 PR 流程</h2>
+<div class="note">每个 PR 从 master（或前一个已合并的 PR）起分支，合并后下一个 PR 再从新 master 起。</div>
+<pre class="mermaid">
+gitGraph
+    commit id: "master (当前)"
+    branch data/new-dataset-loaders
+    commit id: "C1: 数据加载器"
+    checkout main
+    merge data/new-dataset-loaders id: "PR #8 merge" tag: "C1 done"
+    branch feature/binocular-receivers
+    commit id: "C2: 接收器方法"
+    checkout main
+    merge feature/binocular-receivers id: "PR #9 merge" tag: "C2 done"
+    branch experiment/baseline-tasks-batch
+    commit id: "C3: Baseline 批量"
+    checkout main
+    merge experiment/baseline-tasks-batch id: "PR #10 merge" tag: "C3 done"
+    branch experiment/embc-jbhi-codebook
+    commit id: "C4: 码本分析"
+    checkout main
+    merge experiment/embc-jbhi-codebook id: "PR #11 merge" tag: "C4 done"
+    branch experiment/benchmark-dmc-extended
+    commit id: "C5: DMC 扩展"
+    checkout main
+    merge experiment/benchmark-dmc-extended id: "PR #12 merge" tag: "C5 done"
+    branch experiment/crossparadigm-capacity
+    commit id: "C6: 跨范式分析"
+    checkout main
+    merge experiment/crossparadigm-capacity id: "PR #13 merge" tag: "C6 done"
+    branch docs/conventions-update
+    commit id: "C7: 文档约定"
+    checkout main
+    merge docs/conventions-update id: "PR #14 merge" tag: "C7 done"
+</pre>
+
+<h2>图 3：文档层级与信息流</h2>
+<div class="note">四层文档各管一件事，通过链接互相引用。</div>
+<pre class="mermaid">
+graph TB
+    subgraph "全局视角"
+        J["📓 docs/journal/<br/>工作日志<br/><b>做了什么 &amp; 为什么</b>"]
+    end
+    subgraph "PR 视角"
+        PR["🔀 GitHub PR<br/>描述 + Comments<br/><b>技术改动 &amp; 审阅</b>"]
+    end
+    subgraph "任务视角"
+        N["📝 tasks/*/NOTES_*.md<br/>任务笔记<br/><b>操作细节 &amp; 调试</b>"]
+    end
+    subgraph "长期参考"
+        D["📚 docs/*.md<br/>参考文档<br/><b>架构 &amp; 契约 &amp; 方法</b>"]
+    end
+
+    J -- "引用 PR 编号" --> PR
+    PR -- "链接 journal 条目" --> J
+    PR -- "提及相关 NOTES" --> N
+    N -- "操作细节支撑" --> PR
+    J -- "引用参考文档" --> D
+    D -- "被 journal 条目引用" --> J
+
+    style J fill:#e94560,stroke:#c62828,color:#fff
+    style PR fill:#0077b6,stroke:#005f8c,color:#fff
+    style N fill:#2d6a4f,stroke:#1b4332,color:#fff
+    style D fill:#6a1b9a,stroke:#4a148c,color:#fff
+</pre>
+
+<h2>图 4：每个 PR 的具体内容</h2>
+<pre class="mermaid">
+graph TB
+    subgraph C1["C1 数据加载器"]
+        direction LR
+        C1a["vep_arena/data/<br/>broadband_white_noise.py<br/>dual_frequency.py<br/>embc_jbhi.py<br/>mfsc160.py"]
+        C1b["configs/datasets/<br/>local_paths.example.json"]
+        C1c["tests/<br/>test_embc_jbhi_data.py"]
+    end
+
+    subgraph C2["C2 双目接收器方法"]
+        direction LR
+        C2a["vep_arena/methods/<br/>bprca.py<br/>btrca.py<br/>fusionca.py<br/>ecca.py ✏️"]
+        C2b["vep_arena/signal/<br/>filters.py<br/>__init__.py ✏️"]
+        C2c["tests/<br/>test_ecca.py ✏️<br/>test_bprca.py"]
+    end
+
+    subgraph C3["C3 Baseline 任务批量"]
+        direction LR
+        C3a["tasks/ × 13 个数据集<br/>ssvep_embc_jbhi_shared.py<br/>+ 已有任务扩展"]
+    end
+
+    subgraph C4["C4 码本分析"]
+        direction LR
+        C4a["tasks/ssvep_embc_jbhi_*/<br/>binocular_codebook_analysis<br/>fft_features + plot<br/>receiver_matrix"]
+    end
+
+    subgraph C5["C5 DMC 扩展"]
+        direction LR
+        C5a["tasks/benchmark_decision_*/<br/>run_extended + overnight<br/>multichannel 全目录<br/>analyze.py ✏️  plot.py ✏️"]
+        C5b["tests/<br/>test_benchmark_multichannel<br/>test_extended_runner"]
+    end
+
+    subgraph C6["C6 跨范式分析"]
+        direction LR
+        C6a["tasks/<br/>ssvep_jbhi_decision_channel<br/>information_accumulation_rate<br/>crossparadigm_info_efficiency<br/>continuous_mimo_capacity"]
+    end
+
+    subgraph C7["C7 文档"]
+        direction LR
+        C7a["tasks/README.md ✏️<br/>CONTEXT.md<br/>docs/journal/<br/>docs/unification/<br/>docs/data_audit"]
+    end
+
+    style C1 fill:#1b4332,stroke:#2d6a4f,color:#fff
+    style C2 fill:#1b4332,stroke:#2d6a4f,color:#fff
+    style C3 fill:#003566,stroke:#0077b6,color:#fff
+    style C4 fill:#3c1361,stroke:#6a1b9a,color:#fff
+    style C5 fill:#003566,stroke:#0077b6,color:#fff
+    style C6 fill:#5c2018,stroke:#e94560,color:#fff
+    style C7 fill:#333,stroke:#888,color:#ccc
+</pre>
+
+<h2>图 5：未来 tasks/ 目录重组（C7 之后）</h2>
+<pre class="mermaid">
+graph LR
+    subgraph BEFORE["当前 (25+ 扁平目录)"]
+        direction TB
+        B1["benchmark_decision_channel_*"]
+        B2["benchmark_multichannel_*"]
+        B3["ssvep_jbhi_decision_channel"]
+        B4["ssvep_embc_jbhi_*  × 4"]
+        B5["information_accumulation_*"]
+        B6["beta_ssvep_*  × 2"]
+        B7["... 其余 15+"]
+    end
+
+    subgraph AFTER["重组后 (主题分层)"]
+        direction TB
+        A1["baselines/<br/>  ssvep_beta_40t/<br/>  ssvep_hd200/<br/>  cvep_jfpm_nbrs/<br/>  ... × 13"]
+        A2["channel_capacity/<br/>  dmc_benchmark/<br/>  dmc_envelope/<br/>  info_accumulation/<br/>  mimo_design/"]
+        A3["codebook/<br/>  binocular_structure/<br/>  fft_features/<br/>  receiver_comparison/"]
+        A4["probes/<br/>  benchmark_signal/<br/>  binocular_smoke/"]
+    end
+
+    BEFORE --> |"C1-C7 提交入库后<br/>干净状态重组"| AFTER
+
+    style BEFORE fill:#5c2018,stroke:#e94560,color:#fff
+    style AFTER fill:#1b4332,stroke:#2d6a4f,color:#fff
+</pre>
+
+</body>
+</html>
