@@ -1,7 +1,7 @@
 """Cross-analysis: signal-level metrics vs decision-level capacity.
 
 Bridges Phase 1 signal profile (SNR, PLV) with the decision channel
-capacity results produced by the ``benchmark_decision_channel_capacity``
+capacity results produced by the ``CH01_dmc_benchmark``
 task (confusion matrices, C_BA, accuracy).
 
 Key questions answered:
@@ -13,7 +13,7 @@ Key questions answered:
 Usage
 -----
     python cross_analysis.py
-    python cross_analysis.py --capacity-dir ../benchmark_decision_channel_capacity/results
+    python cross_analysis.py --capacity-dir ../../CH01_dmc_benchmark/results
 """
 from __future__ import annotations
 
@@ -35,7 +35,7 @@ from vep_arena.config import BENCHMARK_FREQS
 from vep_arena.signal.utils import harmonic_interference_matrix
 
 TASK_DIR = Path(__file__).resolve().parent
-CAPACITY_TASK = TASK_DIR.parent / "benchmark_decision_channel_capacity"
+CAPACITY_TASK = TASK_DIR.parents[1] / "CH01_dmc_benchmark"
 FREQS = np.asarray(BENCHMARK_FREQS, dtype=np.float64)
 FREQ_SORTED_IDX = np.argsort(FREQS)
 FREQS_SORTED = FREQS[FREQ_SORTED_IDX]

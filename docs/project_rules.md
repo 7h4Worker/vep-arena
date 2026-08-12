@@ -1,7 +1,7 @@
 # VEP Arena 项目规则
 
 > 本文档是项目的**活文档**，随项目演化持续更新。
-> 最后更新: 2026-08-11
+> 最后更新: 2026-08-12
 
 ---
 
@@ -22,7 +22,7 @@
 | `tasks/` 分析类脚本 | ❌ | 决策信道、跨范式、码本等分析（论文相关） |
 | `outputs/` | ❌ | 跨任务综合产出（见§3） |
 | `docs/journal/` | ❌ | 工作日志（含未公开研究进度） |
-| `results/` `runs/` | ❌ | 数据产出（已在 .gitignore） |
+| `.cache/` | ❌ | 运行期缓存（epoch cache 等，已在 .gitignore） |
 
 **判断标准**：如果某文件的存在会泄露未发表论文的核心思路或结论，就不推。
 
@@ -56,6 +56,7 @@ tasks/                         # 分析任务（脚本 + 本地结果）
 ├── _shared/                   #   跨任务共享模块
 └── _legacy/                   #   已归档
 
+.cache/                        # 运行期缓存（epoch cache 等，本地）
 outputs/                       # 跨任务综合产出（本地，见§3）
 
 docs/                          # 文档（项目自身结构与进程）
@@ -168,7 +169,7 @@ PR body 末尾链接 journal：`📓 docs/journal/YYYYMMDD_slug.md`
 |---|------|---------|------|
 | T1 | ~~tasks/ 目录重组（25+ 扁平 → 4 主题）~~ ✅ | journal/20260811 | 无 |
 | T2 | ~~scripts/ 归档（第一代脚本，已被 tasks/ 取代）~~ ✅ | journal/20260811 §scripts | 无 |
-| T3 | results/ runs/ 搬移到 legacy（572MB + 21GB） | journal/20260810 §5 | 无 |
+| T3 | ~~results/ runs/ 搬移到 .cache/ 和 task 本地（572MB + 21GB）~~ ✅ | journal/20260810 §5 | 无 |
 | T4 | `_` 前缀脚本审查（benchmark_dmc, hd200） | 本文档 §3b | T1 后更好 |
 | T5 | 分析类内容本地 commit | 本文档 §1 | T1 后路径稳定 |
 | T6 | 旧分支清理（feat/*, pr/*） | git branch -v | 无 |
@@ -179,5 +180,6 @@ PR body 末尾链接 journal：`📓 docs/journal/YYYYMMDD_slug.md`
 
 | 日期 | 改动 |
 |------|------|
+| 2026-08-12 | 消除 scripts/ results/ runs/ 顶层目录；活跃缓存→.cache/，结果→task 本地，T3 完成 |
 | 2026-08-11 | 更新：分支 → main，docs/ 精简（参考材料移至 notes/），增加§6 待办事项 |
 | 2026-08-10 | 初建：仓库边界、目录架构、产出物流向、命名规则 |

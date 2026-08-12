@@ -27,7 +27,7 @@ TASKS = PROJECT_ROOT / "tasks"
 OUTPUT = TASKS / "ssvep_jbhi_decision_channel" / "figures_envelope_v20260804b"
 TABLES_OUT = TASKS / "ssvep_jbhi_decision_channel" / "tables"
 
-CSV_BENCHMARK = TASKS / "benchmark_decision_channel_capacity" / "results" / "extended" / "combined" / "analysis" / "capacity_by_method_window_aggregate.csv"
+CSV_BENCHMARK = TASKS / "channel" / "CH01_dmc_benchmark" / "results" / "extended" / "combined" / "analysis" / "capacity_by_method_window_aggregate.csv"
 CSV_BINOCULAR = TASKS / "ssvep_binocular_ar_trca" / "analysis" / "decision_channel" / "tables" / "capacity_by_condition_method_window.csv"
 CSV_DUAL_ALPHA = TASKS / "ssvep_dual_alpha_baselines" / "analysis" / "decision_channel" / "tables" / "capacity_by_paradigm_method_window.csv"
 CSV_JFPM = TASKS / "cvep_nbrs_jfpm_tsinghua_2024_baselines" / "analysis" / "decision_channel_coding" / "tables" / "capacity_by_paradigm_method_window.csv"

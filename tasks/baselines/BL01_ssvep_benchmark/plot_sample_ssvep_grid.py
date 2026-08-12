@@ -153,7 +153,7 @@ def main() -> None:
     parser.add_argument("--window", type=float, default=2.0)
     parser.add_argument("--channel", default="Oz")
     parser.add_argument("--epoch-cache", type=Path, default=CACHE_ROOT / "canonical_epochs")
-    parser.add_argument("--output-dir", type=Path, default=PROJECT_ROOT / "results" / "sample_ssvep_grid_s1")
+    parser.add_argument("--output-dir", type=Path, default=Path(__file__).resolve().parent / "results" / "sample_ssvep_grid_s1")
     args = parser.parse_args()
 
     targets = parse_targets(args.targets)

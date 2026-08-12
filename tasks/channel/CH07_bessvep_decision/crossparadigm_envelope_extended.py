@@ -30,7 +30,7 @@ OUTPUT = TASKS / "ssvep_jbhi_decision_channel" / "figures_envelope_extended_v202
 OUTPUT.mkdir(parents=True, exist_ok=True)
 
 # Original data sources
-CSV_BENCHMARK = TASKS / "benchmark_decision_channel_capacity" / "results" / "extended" / "combined" / "analysis" / "capacity_by_method_window_aggregate.csv"
+CSV_BENCHMARK = TASKS / "channel" / "CH01_dmc_benchmark" / "results" / "extended" / "combined" / "analysis" / "capacity_by_method_window_aggregate.csv"
 CSV_BINOCULAR = TASKS / "ssvep_binocular_ar_trca" / "analysis" / "decision_channel" / "tables" / "capacity_by_condition_method_window.csv"
 CSV_DUAL_ALPHA = TASKS / "ssvep_dual_alpha_baselines" / "analysis" / "decision_channel" / "tables" / "capacity_by_paradigm_method_window.csv"
 CSV_JFPM = TASKS / "cvep_nbrs_jfpm_tsinghua_2024_baselines" / "analysis" / "decision_channel_coding" / "tables" / "capacity_by_paradigm_method_window.csv"
@@ -38,7 +38,7 @@ CSV_JBHI = TASKS / "ssvep_jbhi_decision_channel" / "combined_aggregate_capacity.
 
 # New data sources
 CSV_HD200 = TASKS / "ssvep_hd_200target_tdca_sample" / "results" / "offline_tdca_grid" / "decision_channel" / "capacity_by_subject_targets_channels_window.csv"
-CSV_BENCH_MULTI = TASKS / "benchmark_decision_channel_capacity" / "results" / "extended" / "multichannel" / "decision_channel" / "capacity_by_subject_method_channels_window.csv"
+CSV_BENCH_MULTI = TASKS / "channel" / "CH01_dmc_benchmark" / "results" / "extended" / "multichannel" / "decision_channel" / "capacity_by_subject_method_channels_window.csv"
 
 PARADIGM_META = {
     "Benchmark": {"C0": np.log2(40), "M": 40, "color": "#1f77b4", "label": "Benchmark 64ch (40cls, SSVEP)"},

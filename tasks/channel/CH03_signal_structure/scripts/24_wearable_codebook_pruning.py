@@ -27,10 +27,10 @@ import csv
 
 TASK_DIR = Path(__file__).resolve().parent.parent
 FIG_DIR = TASK_DIR / "results" / "figures"
-RESULT_ROOT = Path("D:/ProjData/proj_python/vep_arena/results")
+WEARABLE_ROOT = TASK_DIR / "results" / "wearable_baselines"
 
-WET_DIR = RESULT_ROOT / "wearable_wet_cca_fbcca_ecca_trca_etrca_w02_10"
-DRY_DIR = RESULT_ROOT / "wearable_dry_cca_fbcca_ecca_trca_etrca_w02_10"
+WET_DIR = WEARABLE_ROOT / "wearable_wet_cca_fbcca_ecca_trca_etrca_w02_10"
+DRY_DIR = WEARABLE_ROOT / "wearable_dry_cca_fbcca_ecca_trca_etrca_w02_10"
 
 N_TARGETS = 12
 FREQS = [9.25, 11.25, 13.25, 9.75, 11.75, 13.75,

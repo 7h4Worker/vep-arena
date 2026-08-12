@@ -25,7 +25,7 @@ FIG_DIR = TASK_DIR / "figures"
 TABLE_DIR = TASK_DIR / "tables"
 
 CSV_BENCHMARK = (
-    TASKS / "benchmark_decision_channel_capacity"
+    TASKS / "CH01_dmc_benchmark"
     / "results" / "extended" / "combined" / "analysis"
     / "capacity_by_method_window_aggregate.csv"
 )
