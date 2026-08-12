@@ -294,7 +294,7 @@ def test_jbhi35_historical5_adapter_rejects_non_matlab_target_labels(tmp_path: P
 def test_final_historical_task_config_matches_shared_adapter_contract() -> None:
     project_root = Path(__file__).resolve().parents[1]
     config = json.loads(
-        (project_root / "tasks" / "ssvep_jbhi_35target_baselines" / "five_subject_reproduction_config_20260728.json").read_text(
+        (project_root / "tasks" / "bessvep" / "five_subject_reproduction_config_20260728.json").read_text(
             encoding="utf-8"
         )
     )
@@ -311,9 +311,9 @@ def test_final_historical_runners_use_shared_adapter_and_explicit_outputs() -> N
     project_root = Path(__file__).resolve().parents[1]
     paths = (
         project_root / "vep_arena" / "data" / "embc_jbhi.py",
-        project_root / "tasks" / "ssvep_jbhi_35target_baselines" / "run_five_subject_reproduction.py",
-        project_root / "tasks" / "ssvep_jbhi_35target_baselines" / "run_five_subject_tdca.py",
-        project_root / "tasks" / "ssvep_jbhi_35target_baselines" / "run_five_subject_periodic_receivers.py",
+        project_root / "tasks" / "bessvep" / "run_35t_five_subject_reproduction.py",
+        project_root / "tasks" / "bessvep" / "run_35t_five_subject_tdca.py",
+        project_root / "tasks" / "bessvep" / "run_35t_five_subject_periodic_receivers.py",
     )
     forbidden_tokens = (
         "D:",

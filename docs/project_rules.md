@@ -49,11 +49,10 @@ vep_arena/                     # Python 库（可 import，推 remote）
 └── metrics.py                 #   评分指标
 
 tasks/                         # 分析任务（脚本 + 本地结果）
-├── baselines/                 #   各数据集标准评估（推 remote）  ← 待重组
-├── channel_capacity/          #   信道容量分析（本地）          ← 待重组
-├── codebook/                  #   码本结构分析（本地）          ← 待重组
-├── crossparadigm/             #   跨范式元分析（本地）          ← 待重组
-├── probes/                    #   探索性分析（本地）            ← 待重组
+├── baselines/                 #   公开数据集标准评估（BL01–BL12，推 remote）
+├── bessvep/                   #   BesSSVEP 私有数据集（BS01–BS06，本地）
+├── channel/                   #   信道容量理论分析（CH01–CH07，本地）
+├── probes/                    #   探索性分析（PB01–，本地）
 ├── _shared/                   #   跨任务共享模块
 └── _legacy/                   #   已归档
 
@@ -167,8 +166,8 @@ PR body 末尾链接 journal：`📓 docs/journal/YYYYMMDD_slug.md`
 
 | # | 事项 | 依据文档 | 前置 |
 |---|------|---------|------|
-| T1 | tasks/ 目录重组（25+ 扁平 → 5 主题） | 本文档 §2 | 无 |
-| T2 | scripts/ 归档（第一代脚本，已被 tasks/ 取代） | journal/20260810 §5 | 无 |
+| T1 | ~~tasks/ 目录重组（25+ 扁平 → 4 主题）~~ ✅ | journal/20260811 | 无 |
+| T2 | ~~scripts/ 归档（第一代脚本，已被 tasks/ 取代）~~ ✅ | journal/20260811 §scripts | 无 |
 | T3 | results/ runs/ 搬移到 legacy（572MB + 21GB） | journal/20260810 §5 | 无 |
 | T4 | `_` 前缀脚本审查（benchmark_dmc, hd200） | 本文档 §3b | T1 后更好 |
 | T5 | 分析类内容本地 commit | 本文档 §1 | T1 后路径稳定 |

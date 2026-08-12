@@ -97,9 +97,70 @@ tasks/ 目录从 25+ 扁平目录重组为 4 个主题分类，解决命名混�
 
 分析脚本现在通过 `TASK / "results" / "BS02_16t" / ...` 访问 baseline 结果，纯相对路径。
 
+## 冒烟测试与修复（2026-08-12）
+
+对所有 tasks/ 下 66 个 `parents[N]` 路径引用进行自动化冒烟测试，发现 11 处错误 + 1 处旧 import 路径：
+
+| 类型 | 数量 | 原因 |
+|------|------|------|
+| `analysis/` 子目录 `parents[4]→[5]` | 4 | 重组 +1 层但 sed 模式只覆盖 `parents[2]` |
+| `_legacy/` 深层嵌套 `parents[2]→[5]` | 4 | 搬入 _legacy 时已断裂，重组加深 |
+| `tasks/_legacy/` 历史遗留 `TASK.parents[1]→[3]` | 3 | 重组前即已错误 |
+| 旧 import 路径 `tasks.ssvep_efficient_...` | 1 | hardcoded grep 未覆盖 import 语句 |
+
+全部修复后重测通过。修复已同步到 main 和 feature/tasks-restructure-baselines 分支。
+
+## 测试整理（2026-08-12）
+
+tests/ 中 7 个测试文件按归属重新组织：
+
+| 文件 | 归属 | 处理 |
+|------|------|------|
+| test_sscor.py | `vep_arena.methods` 库 | 留 tests/ |
+| test_ecca.py | `vep_arena.methods` 库 | 留 tests/ |
+| test_bprca.py | `vep_arena.methods` 库 | 留 tests/ |
+| test_channel_capacity.py | `vep_arena.channel` 库 | 留 tests/ |
+| test_embc_jbhi_data.py | `vep_arena.data` 库 | 留 tests/，修 2 处旧路径 |
+| test_benchmark_multichannel_task.py | CH02 专属 | → `channel/CH02_dmc_multichannel/test_task.py` |
+| test_extended_runner.py | CH01 专属 | → `channel/CH01_dmc_benchmark/test_runner.py` |
+
+移入 task 后路径简化（`Path(__file__).resolve().parent` 即 task 根），全套 32 tests passed。
+
+## scripts/ 整理（T2，2026-08-12）
+
+scripts/ 目录从 36 个扁平脚本整理为 3 层结构：
+
+### 迁入 baselines task（7 个）
+
+| 脚本 | 目标 task |
+|------|----------|
+| check_benchmark_offsets.py | BL01_ssvep_benchmark |
+| plot_sample_ssvep_grid.py | BL01_ssvep_benchmark |
+| plot_beta_w02_20_compare.py | BL02_ssvep_beta_9ch |
+| plot_beta_official_grid_compare.py | BL03_ssvep_beta_official_grid |
+| generate_hd200_bigfig.py | BL05_ssvep_hd_200t |
+| generate_hd200_channel_detail.py | BL05_ssvep_hd_200t |
+| generate_hd200_ppt.py | BL05_ssvep_hd_200t |
+
+路径修复：硬编码 `Path("d:/ProjData/...")` → `Path(__file__).resolve().parent` + `TASK.parents[2]`。
+
+### 归档至 scripts/_legacy/（29 个）
+
+第一代评估脚本（DNN、MVMD、report 生成等），已被 tasks/ 体系取代。
+
+### 保留共享 runner（3 个）
+
+- `run_traditional_benchmark.py` — CCA/TRCA 等传统算法
+- `run_tdca.py` — TDCA 独立运行
+- `run_toolbox_ssvep.py` — toolbox 对比
+
+变更已同步至 `feature/tasks-restructure-baselines` 分支。
+
 ## 待处理
 
+- T3: root `results/`（572MB）搬入对应 task 的 results/
+- T3: root `runs/`（21GB）归档
+- T4: `_` 前缀脚本审查（5 个文件）
+- T5: 本地 analysis 内容提交（路径稳定后）
 - theory 分支 `feat/theory-p0-p2-survey-v2` 中的 `survey_v2` 任务待合入 `channel/CH08_survey_p0p1/`
 - `tasks/_shared/` 跨任务共享模块待建
-- root `results/`（572MB）搬入对应 task 的 results/（T3）
-- root `runs/`（21GB）归档（T3）
