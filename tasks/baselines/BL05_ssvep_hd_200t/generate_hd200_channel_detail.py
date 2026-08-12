@@ -7,10 +7,11 @@ from matplotlib.patches import Circle, FancyArrowPatch
 from pathlib import Path
 import csv
 
-ARENA = Path("d:/ProjData/proj_python/vep_arena")
-GRID  = ARENA / "tasks/ssvep_hd_200target_tdca_sample/results/offline_tdca_grid"
+TASK  = Path(__file__).resolve().parent
+ARENA = TASK.parents[2]
+GRID  = TASK / "results" / "offline_tdca_grid"
 CONF  = GRID / "confusions"
-OUT   = ARENA / "docs/ppt_figures"
+OUT   = ARENA / "docs" / "ppt_figures"
 
 plt.rcParams.update({
     'font.family': 'sans-serif',

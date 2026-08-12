@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from vep_arena.config import BENCHMARK_CHANNELS_9, DATA_ROOT, PROJECT_ROOT, BenchmarkSpec
 from vep_arena.data.benchmark import benchmark_filterbank, load_subject_raw, notch_50hz
