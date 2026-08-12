@@ -18,14 +18,14 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from channel_configs import CHANNEL_CONFIGS, CONFIG_BY_SLUG, ChannelConfig
-from vep_arena.config import BENCHMARK_FREQS, DATA_ROOT, RUN_ROOT, BenchmarkSpec
+from vep_arena.config import BENCHMARK_FREQS, CACHE_ROOT, DATA_ROOT, BenchmarkSpec
 from vep_arena.methods.traditional import CCA, ECCA, FBCCA, TRCA
 
 
 TASK_ROOT = Path(__file__).resolve().parent
-PARENT_TASK_ROOT = PROJECT_ROOT / "tasks" / "benchmark_decision_channel_capacity"
+PARENT_TASK_ROOT = PROJECT_ROOT / "tasks" / "channel" / "CH01_dmc_benchmark"
 DEFAULT_RESULT_ROOT = PARENT_TASK_ROOT / "results" / "extended" / "multichannel"
-DEFAULT_CACHE_ROOT = RUN_ROOT / "benchmark_multichannel_fixed5_cache"
+DEFAULT_CACHE_ROOT = CACHE_ROOT / "benchmark_multichannel_fixed5_cache"
 DEFAULT_SOURCE_9CH = PARENT_TASK_ROOT / "results" / "extended" / "coarse_0.1s" / "predictions.csv"
 
 SPEC = BenchmarkSpec()

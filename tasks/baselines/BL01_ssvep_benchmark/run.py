@@ -14,7 +14,7 @@ TASK = Path(__file__).resolve().parent
 PROJECT = TASK.parents[2]
 sys.path.insert(0, str(PROJECT))
 
-from vep_arena.config import DATA_ROOT, RUN_ROOT, BenchmarkSpec
+from vep_arena.config import CACHE_ROOT, DATA_ROOT, BenchmarkSpec
 from vep_arena.data.epochs import CanonicalEpochStore, EpochRequest, epoch_fingerprint
 from vep_arena.data.presets import DatasetPreset, benchmark_9ch_default, benchmark_64ch_default
 from vep_arena.evaluation import (
@@ -198,7 +198,7 @@ def main() -> None:
     parser.add_argument("--methods", default="CCA,FBCCA,ECCA,TRCA,ETRCA,SSCOR,ESSCOR")
     parser.add_argument("--harmonics", type=int, default=5)
     parser.add_argument("--n-fbs", type=int, default=5)
-    parser.add_argument("--epoch-cache", type=Path, default=RUN_ROOT / "canonical_epochs")
+    parser.add_argument("--epoch-cache", type=Path, default=CACHE_ROOT / "canonical_epochs")
     parser.add_argument("--force-epochs", action="store_true")
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--save-score-matrices", action="store_true")
@@ -214,7 +214,7 @@ def main() -> None:
     cache_window = max(windows)
     methods = [x.strip().upper() for x in args.methods.split(",") if x.strip()]
     result_dir = TASK / "results" / args.task_name
-    run_dir = RUN_ROOT / args.task_name
+    run_dir = CACHE_ROOT / args.task_name
     result_dir.mkdir(parents=True, exist_ok=True)
     run_dir.mkdir(parents=True, exist_ok=True)
 

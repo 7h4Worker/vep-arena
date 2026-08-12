@@ -14,7 +14,7 @@ TASK = Path(__file__).resolve().parent
 PROJECT = TASK.parents[2]
 sys.path.insert(0, str(PROJECT))
 
-from vep_arena.config import RUN_ROOT, BenchmarkSpec
+from vep_arena.config import CACHE_ROOT, BenchmarkSpec
 from vep_arena.data.benchmark import reference_signals
 from vep_arena.data.toolbox_adapter import (
     ToolboxDatasetAdapter,
@@ -224,7 +224,7 @@ def main() -> None:
     spec = spec_from_info(info)
     task_name = args.task_name or f"{args.dataset}_traditional_w{windows[0]:g}_{windows[-1]:g}s"
     result_dir = TASK / "results" / task_name
-    run_dir = RUN_ROOT / task_name
+    run_dir = CACHE_ROOT / task_name
     result_dir.mkdir(parents=True, exist_ok=True)
     run_dir.mkdir(parents=True, exist_ok=True)
 

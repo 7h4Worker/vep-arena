@@ -10,7 +10,7 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_ROOT = Path("D:/ProjData/datasets/ssvep_benchmark")
-RESULT_ROOT = PROJECT_ROOT / "results" / "benchmark_9ch"
+CACHE_ROOT = PROJECT_ROOT / ".cache"
 RUN_ROOT = PROJECT_ROOT / "runs"
 
 

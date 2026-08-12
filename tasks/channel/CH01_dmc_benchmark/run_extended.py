@@ -31,7 +31,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from vep_arena.config import BENCHMARK_FREQS, DATA_ROOT, RUN_ROOT, BenchmarkSpec
+from vep_arena.config import BENCHMARK_FREQS, CACHE_ROOT, DATA_ROOT, BenchmarkSpec
 from vep_arena.data.epochs import CanonicalEpochStore, EpochRequest, epoch_fingerprint
 from vep_arena.data.presets import benchmark_9ch_default
 from vep_arena.methods.bprca import BPRCA
@@ -42,7 +42,7 @@ from vep_arena.metrics import itr_bits_per_minute
 
 TASK_ROOT = Path(__file__).resolve().parent
 RESULTS_DIR = TASK_ROOT / "results" / "extended"
-DEFAULT_EPOCH_CACHE = RUN_ROOT / "canonical_epochs"
+DEFAULT_EPOCH_CACHE = CACHE_ROOT / "canonical_epochs"
 
 SPEC = BenchmarkSpec()
 FREQUENCIES = BENCHMARK_FREQS
