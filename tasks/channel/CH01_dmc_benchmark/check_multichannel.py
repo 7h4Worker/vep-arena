@@ -1,7 +1,15 @@
-"""Check completeness of Benchmark multichannel capacity results."""
+"""Benchmark 多通道配置容量结果完整性检查。
+
+数据源: CH01 extended/multichannel 运行结果
+"""
+from pathlib import Path
+
+import numpy as np
 import pandas as pd
 
-CSV = "tasks/channel/CH01_dmc_benchmark/results/extended/multichannel/decision_channel/capacity_by_subject_method_channels_window.csv"
+TASK_DIR = Path(__file__).resolve().parent
+CSV = TASK_DIR / "results" / "extended" / "multichannel" / "decision_channel" / "capacity_by_subject_method_channels_window.csv"
+
 df = pd.read_csv(CSV)
 
 print(f"Shape: {df.shape}")

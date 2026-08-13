@@ -1,22 +1,31 @@
-"""Visualization: Cross-dataset channel reduction comparison.
+"""跨数据集通道削减效应可视化：Benchmark vs HD200。
 
-Figures:
-1. HD200 target×channel interaction heatmap
-2. Benchmark vs HD200 η curves by channel config
-3. Per-subject loss distribution (violin/swarm)
-4. Benchmark spatial topology: posterior vs wholehead
-5. Method sensitivity radar/bar chart
+图表:
+1. HD200 目标数×通道数损失热力图
+2. Benchmark vs HD200 η 曲线（按通道配置）
+3. 受试者间损失分布（box + scatter）
+4. Benchmark 空间拓扑效应：posterior vs wholehead
+5. 各方法通道敏感度柱状图
+6. HD200 多目标数 η vs 通道数曲线
+
+数据源:
+  - CH01 extended/multichannel 容量结果
+  - BL05 offline_tdca_grid 容量结果
 """
+from pathlib import Path
+
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from pathlib import Path
 
-BENCH_CSV = "tasks/channel/CH01_dmc_benchmark/results/extended/multichannel/decision_channel/capacity_by_subject_method_channels_window.csv"
-HD200_CSV = "tasks/baselines/BL05_ssvep_hd_200t/results/offline_tdca_grid/decision_channel/capacity_by_subject_targets_channels_window.csv"
-OUTPUT = Path("tasks/channel/CH01_dmc_benchmark/figures_channel_comparison_v20260807")
+TASK_DIR = Path(__file__).resolve().parent
+TASKS = TASK_DIR.parents[1]
+
+BENCH_CSV = TASK_DIR / "results" / "extended" / "multichannel" / "decision_channel" / "capacity_by_subject_method_channels_window.csv"
+HD200_CSV = TASKS / "baselines" / "BL05_ssvep_hd_200t" / "results" / "offline_tdca_grid" / "decision_channel" / "capacity_by_subject_targets_channels_window.csv"
+OUTPUT = TASK_DIR / "figures_channel_comparison_v20260807"
 OUTPUT.mkdir(parents=True, exist_ok=True)
 
 bench = pd.read_csv(BENCH_CSV)

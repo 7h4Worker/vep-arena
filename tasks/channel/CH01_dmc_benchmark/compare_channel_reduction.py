@@ -1,17 +1,26 @@
-"""Comprehensive channel reduction analysis: Benchmark vs HD200.
+"""跨数据集通道削减综合分析：Benchmark vs HD200。
 
-Extended analyses:
-1. HD200 target scaling × channel interaction (does channel loss accelerate with more targets?)
-2. Benchmark spatial topology: wholehead32 vs posterior32 (same count, different placement)
-3. Benchmark method sensitivity to channel count (which methods degrade most?)
-4. Cross-dataset normalized comparison: eta(channels) curves
-5. Information loss decomposition: how much capacity is "spatial" vs "temporal"
+分析内容:
+1. HD200 目标数×通道数交互效应（通道损失是否随目标数加剧？）
+2. Benchmark 空间拓扑：wholehead32 vs posterior32（同通道数、不同电极位置）
+3. Benchmark 各方法对通道削减的敏感度排序
+4. 跨数据集归一化 η 曲线对比
+5. 受试者间通道敏感度分布
+
+数据源:
+  - CH01 extended/multichannel 容量结果
+  - BL05 offline_tdca_grid 容量结果
 """
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
-BENCH_CSV = "tasks/channel/CH01_dmc_benchmark/results/extended/multichannel/decision_channel/capacity_by_subject_method_channels_window.csv"
-HD200_CSV = "tasks/baselines/BL05_ssvep_hd_200t/results/offline_tdca_grid/decision_channel/capacity_by_subject_targets_channels_window.csv"
+TASK_DIR = Path(__file__).resolve().parent
+TASKS = TASK_DIR.parents[1]
+
+BENCH_CSV = TASK_DIR / "results" / "extended" / "multichannel" / "decision_channel" / "capacity_by_subject_method_channels_window.csv"
+HD200_CSV = TASKS / "baselines" / "BL05_ssvep_hd_200t" / "results" / "offline_tdca_grid" / "decision_channel" / "capacity_by_subject_targets_channels_window.csv"
 
 bench = pd.read_csv(BENCH_CSV)
 hd200 = pd.read_csv(HD200_CSV)

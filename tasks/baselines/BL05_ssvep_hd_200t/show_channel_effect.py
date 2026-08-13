@@ -1,8 +1,16 @@
-"""Quick display of channel reduction effect on C_BA."""
-import pandas as pd
-import numpy as np
+"""HD200 通道削减效应：C_BA vs 通道数 × 目标数的交互作用。
 
-df = pd.read_csv('tasks/baselines/BL05_ssvep_hd_200t/results/offline_tdca_grid/decision_channel/capacity_aggregate.csv')
+数据源: BL05 offline_tdca_grid → decision_channel/capacity_aggregate.csv
+"""
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+TASK_DIR = Path(__file__).resolve().parent
+CSV = TASK_DIR / "results" / "offline_tdca_grid" / "decision_channel" / "capacity_aggregate.csv"
+
+df = pd.read_csv(CSV)
 
 print("=" * 100)
 print("HD200: Channel Reduction Effect on C_BA (信道物理分辨率 vs 信源分辨率)")

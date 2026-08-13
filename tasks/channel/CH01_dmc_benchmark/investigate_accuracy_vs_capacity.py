@@ -1,12 +1,21 @@
-"""Investigate the apparent paradox: fewer channels -> higher C_BA but lower accuracy?
+"""通道数与容量的表观悖论：更少通道为何可能带来更高 C_BA？
 
-Check whether this is true, and if so, explain the mechanism.
-Also compare optimal operating points (peak ITR) across channel configs.
+分析内容:
+- 同方法下通道配置对 accuracy 和 C_BA 的影响
+- 跨方法 envelope（逐受试者最优方法）的通道配置对比
+- 各通道配置的最优工作点（peak ITR）比较
+- 机制解释：C_BA 是混淆结构的函数，非准确率的单调函数
+
+数据源: CH01 extended/multichannel 容量结果
 """
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
-BENCH_CSV = "tasks/channel/CH01_dmc_benchmark/results/extended/multichannel/decision_channel/capacity_by_subject_method_channels_window.csv"
+TASK_DIR = Path(__file__).resolve().parent
+BENCH_CSV = TASK_DIR / "results" / "extended" / "multichannel" / "decision_channel" / "capacity_by_subject_method_channels_window.csv"
+
 bench = pd.read_csv(BENCH_CSV)
 
 C0 = np.log2(40)

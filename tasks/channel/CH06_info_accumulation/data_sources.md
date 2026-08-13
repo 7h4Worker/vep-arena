@@ -6,7 +6,7 @@
 
 ## 1. Benchmark (Tsinghua SSVEP Benchmark)
 
-- **来源**: `benchmark_decision_channel_capacity/results/extended/combined/analysis/capacity_by_method_window_aggregate.csv`
+- **来源**: `channel/CH01_dmc_benchmark/results/extended/combined/analysis/capacity_by_method_window_aggregate.csv`
 - **数据集**: Tsinghua SSVEP Benchmark (Wang et al. 2017), 35 subjects, 40 targets
 - **方法**: CCA, ETRCA
 - **窗口**: coarse 0.1–5.0 s（0.1s 步长）+ fine 0.100–0.404 s（2 samples / 8ms 步长），去除重叠后共 87 点
@@ -20,7 +20,7 @@
 
 ## 2. Binocular AR (Ke 2025)
 
-- **来源**: `ssvep_binocular_ar_trca/analysis/decision_channel/tables/capacity_by_condition_method_window.csv`
+- **来源**: `baselines/BL06_ssvep_binocular_ar/analysis/decision_channel/tables/capacity_by_condition_method_window.csv`
 - **数据集**: Ke 2025 Binocular AR, 14–17 subjects, 8 targets
 - **方法**: CCA, FBCCA, TRCA, ETRCA
 - **窗口**: 0.1–3.0 s, step 0.1 s (30 points)
@@ -32,7 +32,7 @@
 
 ## 3. Dual Alpha (GigaDB 102557)
 
-- **来源**: `ssvep_dual_alpha_baselines/analysis/decision_channel/tables/capacity_by_paradigm_method_window.csv`
+- **来源**: `baselines/BL08_ssvep_dual_alpha/analysis/decision_channel/tables/capacity_by_paradigm_method_window.csv`
 - **数据集**: GigaDB 102557, 35 subjects, 40 targets
 - **方法**: ETRCA, FBDCCA
 - **窗口**: 0.2–2.0 s, step 0.2 s (10 points)
@@ -44,7 +44,7 @@
 
 ## 4. JFPM / NBRS (Zheng 2024)
 
-- **来源**: `cvep_nbrs_jfpm_tsinghua_2024_baselines/analysis/decision_channel_coding/tables/capacity_by_paradigm_method_window.csv`
+- **来源**: `baselines/BL12_cvep_nbrs_jfpm/analysis/decision_channel_coding/tables/capacity_by_paradigm_method_window.csv`
 - **数据集**: Zheng 2024 JFPM+NBRS, 100 subjects, 40 targets (JFPM-8) / 8 targets (NBRS-8) / 15 targets (NBRS-15)
 - **方法**: FBCCA-CODE, TRCA, MSTRCA
 - **窗口**: 0.4, 0.8, 1.2, 1.6, 2.0, 2.4, 3.0, 4.0 s (8 points, 非均匀)
