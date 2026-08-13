@@ -20,27 +20,27 @@ import pandas as pd
 
 # ── paths ────────────────────────────────────────────────────────────────
 TASK_DIR = Path(__file__).resolve().parent
-TASKS = TASK_DIR.parent
+TASKS = TASK_DIR.parents[1]
 FIG_DIR = TASK_DIR / "figures"
 TABLE_DIR = TASK_DIR / "tables"
 
 CSV_BENCHMARK = (
-    TASKS / "CH01_dmc_benchmark"
+    TASKS / "channel" / "CH01_dmc_benchmark"
     / "results" / "extended" / "combined" / "analysis"
     / "capacity_by_method_window_aggregate.csv"
 )
 CSV_BINOCULAR = (
-    TASKS / "ssvep_binocular_ar_trca"
+    TASKS / "baselines" / "BL06_ssvep_binocular_ar"
     / "analysis" / "decision_channel" / "tables"
     / "capacity_by_condition_method_window.csv"
 )
 CSV_DUAL_ALPHA = (
-    TASKS / "ssvep_dual_alpha_baselines"
+    TASKS / "baselines" / "BL08_ssvep_dual_alpha"
     / "analysis" / "decision_channel" / "tables"
     / "capacity_by_paradigm_method_window.csv"
 )
 CSV_JFPM = (
-    TASKS / "cvep_nbrs_jfpm_tsinghua_2024_baselines"
+    TASKS / "baselines" / "BL12_cvep_nbrs_jfpm"
     / "analysis" / "decision_channel_coding" / "tables"
     / "capacity_by_paradigm_method_window.csv"
 )

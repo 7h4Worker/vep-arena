@@ -26,18 +26,19 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 TASKS = PROJECT_ROOT / "tasks"
-OUTPUT = TASKS / "ssvep_jbhi_decision_channel" / "figures_envelope_extended_v20260808"
+TASK_DIR = Path(__file__).resolve().parent
+OUTPUT = TASK_DIR / "figures_envelope_extended_v20260808"
 OUTPUT.mkdir(parents=True, exist_ok=True)
 
 # Original data sources
 CSV_BENCHMARK = TASKS / "channel" / "CH01_dmc_benchmark" / "results" / "extended" / "combined" / "analysis" / "capacity_by_method_window_aggregate.csv"
-CSV_BINOCULAR = TASKS / "ssvep_binocular_ar_trca" / "analysis" / "decision_channel" / "tables" / "capacity_by_condition_method_window.csv"
-CSV_DUAL_ALPHA = TASKS / "ssvep_dual_alpha_baselines" / "analysis" / "decision_channel" / "tables" / "capacity_by_paradigm_method_window.csv"
-CSV_JFPM = TASKS / "cvep_nbrs_jfpm_tsinghua_2024_baselines" / "analysis" / "decision_channel_coding" / "tables" / "capacity_by_paradigm_method_window.csv"
-CSV_JBHI = TASKS / "ssvep_jbhi_decision_channel" / "combined_aggregate_capacity.csv"
+CSV_BINOCULAR = TASKS / "baselines" / "BL06_ssvep_binocular_ar" / "analysis" / "decision_channel" / "tables" / "capacity_by_condition_method_window.csv"
+CSV_DUAL_ALPHA = TASKS / "baselines" / "BL08_ssvep_dual_alpha" / "analysis" / "decision_channel" / "tables" / "capacity_by_paradigm_method_window.csv"
+CSV_JFPM = TASKS / "baselines" / "BL12_cvep_nbrs_jfpm" / "analysis" / "decision_channel_coding" / "tables" / "capacity_by_paradigm_method_window.csv"
+CSV_JBHI = TASK_DIR / "combined_aggregate_capacity.csv"
 
 # New data sources
-CSV_HD200 = TASKS / "ssvep_hd_200target_tdca_sample" / "results" / "offline_tdca_grid" / "decision_channel" / "capacity_by_subject_targets_channels_window.csv"
+CSV_HD200 = TASKS / "baselines" / "BL05_ssvep_hd_200t" / "results" / "offline_tdca_grid" / "decision_channel" / "capacity_by_subject_targets_channels_window.csv"
 CSV_BENCH_MULTI = TASKS / "channel" / "CH01_dmc_benchmark" / "results" / "extended" / "multichannel" / "decision_channel" / "capacity_by_subject_method_channels_window.csv"
 
 PARADIGM_META = {

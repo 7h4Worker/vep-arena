@@ -25,13 +25,13 @@ TASK_DIR = Path(__file__).resolve().parent.parent
 FIG_DIR = TASK_DIR / "results" / "figures"
 
 # ── Binocular AR paths ──
-BINO_ROOT = Path("D:/ProjData/proj_python/vep_arena/tasks/baselines/BL06_ssvep_binocular_ar/results")
+BINO_ROOT = TASK_DIR.parents[1] / "baselines" / "BL06_ssvep_binocular_ar" / "results"
 BINO_EXP1 = BINO_ROOT / "experiment1_trca" / "predictions.csv"
 BINO_EXP2 = BINO_ROOT / "experiment2_trca" / "predictions.csv"
 BINO_EXP3 = BINO_ROOT / "experiment3_trca" / "predictions.csv"
 
 # ── JFPM paths ──
-JFPM_ROOT = Path("D:/ProjData/proj_python/vep_arena/tasks/baselines/BL12_cvep_nbrs_jfpm/results")
+JFPM_ROOT = TASK_DIR.parents[1] / "baselines" / "BL12_cvep_nbrs_jfpm" / "results"
 JFPM_FULL = JFPM_ROOT / "full_occipital9_fbcca_trca_w04_40_20260706" / "predictions.csv"
 JFPM_MSTRCA = JFPM_ROOT / "full_occipital9_mstrca_v2_paper_preproc_w04_40_20260706" / "predictions.csv"
 

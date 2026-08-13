@@ -471,7 +471,7 @@ def main() -> None:
     pending = [unit for unit in units if latest_status.get(unit) != "complete"]
     run_type = "arena_native_tdca_full" if len(subjects) == 35 else "arena_native_tdca_smoke"
     manifest = {
-        "task": "ssvep_dual_alpha_baselines",
+        "task": "BL08_ssvep_dual_alpha",
         "run_type": run_type,
         "subjects": subjects,
         "paradigms": paradigms,
