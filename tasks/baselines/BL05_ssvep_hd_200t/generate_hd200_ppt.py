@@ -19,7 +19,7 @@ TASK  = Path(__file__).resolve().parent
 ARENA = TASK.parents[2]
 GRID  = TASK / "results" / "offline_tdca_grid"
 CONF  = GRID / "confusions"
-OUT   = ARENA / "docs" / "ppt_figures"
+OUT   = TASK / "results" / "ppt_figures"
 OUT.mkdir(exist_ok=True)
 
 plt.rcParams.update({
