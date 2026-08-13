@@ -15,8 +15,7 @@ __pycache__/
 
 # Arena generated artifacts
 .cache/
-results/_archive/
-runs/_archive/
+_archive/
 outputs/
 成果汇总/
 tasks/**/results/**
