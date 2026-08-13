@@ -32,15 +32,16 @@ from vep_arena.channel.capacity import (
 )
 from vep_arena.channel.confusion import confusion_counts, normalize_confusion
 
-JBHI16_PREDICTIONS = PROJECT_ROOT / "tasks" / "ssvep_jbhi_16target_baselines" / "results" / "full" / "predictions.csv"
-JBHI35_ROOT = PROJECT_ROOT / "tasks" / "ssvep_jbhi_35target_baselines" / "results" / "final_five_execution_20260730"
+TASK_DIR = Path(__file__).resolve().parent
+JBHI16_PREDICTIONS = PROJECT_ROOT / "tasks" / "bessvep" / "results" / "BS02_16t" / "full" / "predictions.csv"
+JBHI35_ROOT = PROJECT_ROOT / "tasks" / "bessvep" / "results" / "BS03_35t" / "final_five_execution_20260730"
 JBHI35_TDCA = JBHI35_ROOT / "tdca_full" / "predictions.csv"
 JBHI35_PERIODIC = JBHI35_ROOT / "periodic_receivers_full" / "predictions.csv"
 JBHI35_ETRCA = JBHI35_ROOT / "etrca_2s" / "predictions.csv"
 
-OUTPUT_ROOT = PROJECT_ROOT / "tasks" / "ssvep_jbhi_decision_channel"
-FIGURES = OUTPUT_ROOT / "figures_full"
-TABLES = OUTPUT_ROOT / "tables"
+OUTPUT_ROOT = TASK_DIR
+FIGURES = TASK_DIR / "figures_full"
+TABLES = TASK_DIR / "tables"
 ITR_SHIFT = 0.5
 
 

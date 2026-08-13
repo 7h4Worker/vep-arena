@@ -28,7 +28,7 @@ FIG_DIR.mkdir(parents=True, exist_ok=True)
 
 HD_ROOT = Path("D:/ProjData/datasets/ssvep_hd_200target")
 CACHE_DIR = HD_ROOT / "derivatives" / "tdca_sample" / "cache"
-RESULTS_DIR = Path("D:/ProjData/proj_python/vep_arena/tasks/baselines/BL05_ssvep_hd_200t/results")
+RESULTS_DIR = TASK_DIR.parents[1] / "baselines" / "BL05_ssvep_hd_200t" / "results"
 
 FS = 250
 LATENCY_SAMPLES = 35

@@ -170,7 +170,7 @@ def main() -> None:
     parser.add_argument("--windows", default="0.5,1.0,1.5,2.0")
     parser.add_argument("--n-fbs", type=int, default=5)
     parser.add_argument("--harmonics", type=int, default=5)
-    parser.add_argument("--output-dir", type=Path, default=PROJECT_ROOT / "results" / "offset_check_s1")
+    parser.add_argument("--output-dir", type=Path, default=Path(__file__).resolve().parent / "results" / "offset_check_s1")
     args = parser.parse_args()
 
     spec = BenchmarkSpec()

@@ -16,7 +16,7 @@ import pandas as pd
 TASK_ROOT = Path(__file__).resolve().parent
 DEFAULT_RESULT_ROOT = (
     TASK_ROOT.parent
-    / "benchmark_decision_channel_capacity"
+    / "CH01_dmc_benchmark"
     / "results"
     / "extended"
     / "multichannel"

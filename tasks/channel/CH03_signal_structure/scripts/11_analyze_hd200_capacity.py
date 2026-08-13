@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 TASK_DIR = Path(__file__).resolve().parent
-HD_TASK = TASK_DIR.parent / "ssvep_hd_200target_tdca_sample"
+HD_TASK = TASK_DIR.parents[2] / "baselines" / "BL05_ssvep_hd_200t"
 BEST_CSV = HD_TASK / "results" / "offline_tdca_grid" / "offline_tdca_best_itr_by_subject_config.csv"
 FIG_DIR = TASK_DIR / "results" / "figures"
 FIG_DIR.mkdir(parents=True, exist_ok=True)

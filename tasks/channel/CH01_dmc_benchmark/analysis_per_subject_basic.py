@@ -13,10 +13,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-TASKS = PROJECT_ROOT / "tasks"
-CSV = TASKS / "benchmark_decision_channel_capacity" / "results" / "extended" / "combined" / "analysis" / "capacity_by_subject_method_window.csv"
-OUTPUT = TASKS / "benchmark_decision_channel_capacity" / "figures_per_subject_v20260804"
+TASK_DIR = Path(__file__).resolve().parent
+CSV = TASK_DIR / "results" / "extended" / "combined" / "analysis" / "capacity_by_subject_method_window.csv"
+OUTPUT = TASK_DIR / "figures_per_subject_v20260804"
 OUTPUT.mkdir(parents=True, exist_ok=True)
 
 df = pd.read_csv(CSV)

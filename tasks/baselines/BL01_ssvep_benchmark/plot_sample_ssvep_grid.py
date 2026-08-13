@@ -16,7 +16,7 @@ from scipy import signal
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from vep_arena.config import BENCHMARK_FREQS, PROJECT_ROOT, RUN_ROOT
+from vep_arena.config import BENCHMARK_FREQS, CACHE_ROOT, PROJECT_ROOT
 from vep_arena.data.epochs import CanonicalEpochStore, EpochRequest, epoch_fingerprint
 from vep_arena.data.presets import benchmark_9ch_default
 
@@ -152,8 +152,8 @@ def main() -> None:
     parser.add_argument("--targets", default="1-8")
     parser.add_argument("--window", type=float, default=2.0)
     parser.add_argument("--channel", default="Oz")
-    parser.add_argument("--epoch-cache", type=Path, default=RUN_ROOT / "canonical_epochs")
-    parser.add_argument("--output-dir", type=Path, default=PROJECT_ROOT / "results" / "sample_ssvep_grid_s1")
+    parser.add_argument("--epoch-cache", type=Path, default=CACHE_ROOT / "canonical_epochs")
+    parser.add_argument("--output-dir", type=Path, default=Path(__file__).resolve().parent / "results" / "sample_ssvep_grid_s1")
     args = parser.parse_args()
 
     targets = parse_targets(args.targets)
