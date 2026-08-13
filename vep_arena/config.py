@@ -11,7 +11,6 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_ROOT = Path("D:/ProjData/datasets/ssvep_benchmark")
 CACHE_ROOT = PROJECT_ROOT / ".cache"
-RUN_ROOT = PROJECT_ROOT / "runs"
 
 
 BENCHMARK_CHANNELS_9 = (48, 54, 55, 56, 57, 58, 61, 62, 63)
