@@ -9,7 +9,7 @@ import sys
 import numpy as np
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from vep_arena.channel.capacity import capacity_ba, capacity_c1, mutual_info_uniform
 from vep_arena.channel.confusion import confusion_counts, normalize_confusion

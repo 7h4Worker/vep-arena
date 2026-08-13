@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 
-SCRIPT = Path(__file__).resolve().parents[1] / "tasks" / "ssvep_neural_communication_survey_v2" / "run_p1_frontload_analysis.py"
+SCRIPT = Path(__file__).resolve().parents[1] / "tasks" / "channel" / "CH08_survey_p0p1" / "run_p1_frontload_analysis.py"
 SPEC = importlib.util.spec_from_file_location("survey_v2_p1", SCRIPT)
 assert SPEC is not None and SPEC.loader is not None
 MODULE = importlib.util.module_from_spec(SPEC)

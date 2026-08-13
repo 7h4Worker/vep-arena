@@ -170,7 +170,7 @@ PR body 末尾链接 journal：`📓 docs/journal/YYYYMMDD_slug.md`
 | T1 | ~~tasks/ 目录重组（25+ 扁平 → 4 主题）~~ ✅ | journal/20260811 | 无 |
 | T2 | ~~scripts/ 归档（第一代脚本，已被 tasks/ 取代）~~ ✅ | journal/20260811 §scripts | 无 |
 | T3 | ~~results/ runs/ 搬移到 .cache/ 和 task 本地（572MB + 21GB）~~ ✅ | journal/20260810 §5 | 无 |
-| T4 | `_` 前缀脚本审查（benchmark_dmc, hd200） | 本文档 §3b | T1 后更好 |
+| T4 | ~~`_` 前缀脚本审查（benchmark_dmc, hd200）~~ ✅ | 本文档 §3b | T1 后更好 |
 | T5 | 分析类内容本地 commit | 本文档 §1 | T1 后路径稳定 |
 | T6 | 旧分支清理（feat/*, pr/*） | git branch -v | 无 |
 
