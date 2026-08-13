@@ -171,8 +171,8 @@ PR body 末尾链接 journal：`📓 docs/journal/YYYYMMDD_slug.md`
 | T2 | ~~scripts/ 归档（第一代脚本，已被 tasks/ 取代）~~ ✅ | journal/20260811 §scripts | 无 |
 | T3 | ~~results/ runs/ 搬移到 .cache/ 和 task 本地（572MB + 21GB）~~ ✅ | journal/20260810 §5 | 无 |
 | T4 | ~~`_` 前缀脚本审查（benchmark_dmc, hd200）~~ ✅ | 本文档 §3b | T1 后更好 |
-| T5 | 分析类内容本地 commit | 本文档 §1 | T1 后路径稳定 |
-| T6 | 旧分支清理（feat/*, pr/*） | git branch -v | 无 |
+| T5 | ~~分析类内容本地 commit~~ ✅ | 本文档 §1 | T1 后路径稳定 |
+| T6 | ~~旧分支清理（feat/*, pr/*）~~ ✅ | git branch -v | 无 |
 
 ---
 
@@ -180,6 +180,7 @@ PR body 末尾链接 journal：`📓 docs/journal/YYYYMMDD_slug.md`
 
 | 日期 | 改动 |
 |------|------|
+| 2026-08-13 | 合并 theory 分支并迁入 CH08_survey_p0p1/，T4/T5/T6 全部完成，§6 清零 |
 | 2026-08-12 | 消除 scripts/ results/ runs/ 顶层目录；活跃缓存→.cache/，结果→task 本地，T3 完成 |
 | 2026-08-11 | 更新：分支 → main，docs/ 精简（参考材料移至 notes/），增加§6 待办事项 |
 | 2026-08-10 | 初建：仓库边界、目录架构、产出物流向、命名规则 |
