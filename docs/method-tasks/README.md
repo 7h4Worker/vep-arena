@@ -14,7 +14,7 @@
 | M05 | Multi-objective high-pass | TIM 2022 | `35_2022_zhang_mohp` ✅ | 待实现 |
 | M06 | Sinusoidal-referenced TRCA | Infocomm 2023 | `36_2023_wang_sinref_trca` ✅ | 待实现 |
 | M07 | xTRCA | NeuroImage 2019 | `37_2019_tanaka_xtrca` ✅ | 待实现 |
-| M08 | gTRCA | Sci Reports 2020 | `38_2020_tanaka_gtrca` ✅ | 待实现 |
+| M08 | gTRCA | Sci Reports 2020 | `38_2020_tanaka_gtrca` ✅ | ✓ |
 | M09 | scTRCA | JNE 2021 | `39_2021_sun_sctrca` ✅ | 待实现 |
 
 > curated 包索引规则：`curated/papers/<分类>/<NN_YYYY_author_topic>/paper_record.json`
