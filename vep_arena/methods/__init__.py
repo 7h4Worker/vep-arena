@@ -3,3 +3,7 @@
 # Last updated: 2026-06-17
 # Description: Part of the VEP Arena SSVEP benchmark workspace.
 """Method adapters."""
+
+from vep_arena.methods.sctrca import scTRCA
+
+__all__ = ["scTRCA"]
