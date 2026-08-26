@@ -3,3 +3,7 @@
 # Last updated: 2026-06-17
 # Description: Part of the VEP Arena SSVEP benchmark workspace.
 """Method adapters."""
+
+from vep_arena.methods.ress import RESS
+
+__all__ = ["RESS"]

@@ -7,7 +7,7 @@
 
 | 任务 | 方法 | 论文 | curated 包 | 状态 |
 |---|---|---|---|---|
-| M01 | RESS | Xu/Ke 2024 TNSRE | `28_2024_xu_rhythmic_entrain` ✅ | 待实现 |
+| M01 | RESS | Xu/Ke 2024 TNSRE | `28_2024_xu_rhythmic_entrain` ✅ | ✓ |
 | M02 | PRCA | Ke 2024 TBME | `19_2024_ke_bprca` ✅ | 待实现 |
 | M03 | sTRCA (time-filter+sim) | Measurement 2024 | `33_2024_yin_strca` ✅ | 待实现 |
 | M04 | LA-TRCA | TNSRE 2022 | `34_2022_huang_latrca` ✅ | 待实现 |
