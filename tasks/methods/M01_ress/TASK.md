@@ -11,7 +11,9 @@ Xu W, Ke Y, Ming D, IEEE TNSRE 32:4284-4293 (2024), DOI 10.1109/TNSRE.2024.35037
 
 ## Curated 论文索引（复现核对原文）
 28_2024_xu_rhythmic_entrain
-（若标注"未提取"：先向主 agent 请求补提取，或直接从 Zotero/DOI 获取原文核对）
+包位置: `curated/papers/03-vep-algorithm/11-spatial-filter/28_2024_xu_rhythmic_entrain/`（已提取 ✅）
+
+> 若标注"未提取"：先向主 agent 请求补提取，或直接从 Zotero/DOI 获取原文核对）
 
 ## 实现要求
 1. 新增 `vep_arena/methods/ress.py`，实现 `class RESS`：

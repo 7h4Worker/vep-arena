@@ -11,7 +11,9 @@ Ke Y, Liu S, Ming D, IEEE TBME 71(4) (2024), DOI 10.1109/TBME.2023.3333435
 
 ## Curated 论文索引（复现核对原文）
 19_2024_ke_bprca
-（若标注"未提取"：先向主 agent 请求补提取，或直接从 Zotero/DOI 获取原文核对）
+包位置: `curated/papers/03-vep-algorithm/11-spatial-filter/19_2024_ke_bprca/`（已提取 ✅）
+
+> 若标注"未提取"：先向主 agent 请求补提取，或直接从 Zotero/DOI 获取原文核对）
 
 ## 实现要求
 1. 新增 `vep_arena/methods/prca.py`，实现 `class PRCA`：
