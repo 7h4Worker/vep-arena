@@ -10,7 +10,10 @@ IEEE TIM (2022), DOI 10.1109/TIM.2022.3146950
 见 `docs/method-tasks/M05_mohp.md` —— 含核心算法、curated 包索引、验证协议、期望结果。
 
 ## Curated 论文索引（复现核对原文）
-未提取（DOI 10.1109/TIM.2022.3146950）
+35_2022_zhang_mohp
+包位置: `curated/papers/03-vep-algorithm/11-spatial-filter/35_2022_zhang_mohp/`（已提取 ✅）
+
+> 若标注 10.1109/TIM.2022.3146950）
 （若标注"未提取"：先向主 agent 请求补提取，或直接从 Zotero/DOI 获取原文核对）
 
 ## 实现要求
@@ -26,13 +29,12 @@ IEEE TIM (2022), DOI 10.1109/TIM.2022.3146950
 - 协议: 对齐 TRCA/SSCOR 类; Benchmark 9ch
 - 预处理与 BL01 一致（cue 跳过 0.5s、潜伏期 0.14s、notch 50Hz、filterbank）
 
-## 期望结果与验收
-1. 结果写入 `tasks/methods/M05_mohp/results/`（trials.csv + summary.csv + figures）
-2. 与规格文档"期望结果"的论文数字 diff ≤ 2%（acc）
-3. 汇报：实现文件、注册方式、Benchmark/BETA 各窗口 acc/ITR 表、与论文对比结论
-4. 更新 `docs/method-tasks/README.md` 状态列 → 已完成
+## 期望结果（论文 Table，curated 包 35 提取）
+- 统计表：MsetCCA vs Proposed 在 Dataset I/II/Benchmark 各窗口（0.25-1s / 0.2-0.8s）均 p<0.0001（显著改进）
+- 验收：Benchmark 上 proposed 方法 ≥ MsetCCA/TRCA，显著性方向一致
 
-## 环境
-- Python: `D:\ProjData\proj_pythonep_arena\.venv\Scripts\python.exe`
-- 数据集: `D:/ProjData/datasets`（local_paths.json 已配置）
-- 运行示例: `.venv\Scripts\python.exe tasks/methods/M05_mohp/run.py --workers 2 --resume`
+## 验收流程（原）
+1. 结果写入 `tasks/methods/M05_mohp/results/`
+2. 与规格文档期望数字 diff ≤ 2%
+3. 汇报实现/注册/结果表/对比结论
+4. 更新 docs/method-tasks/README.md

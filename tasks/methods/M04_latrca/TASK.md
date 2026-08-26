@@ -10,7 +10,10 @@ IEEE TNSRE (2022), DOI 10.1109/TNSRE.2022.3162029
 见 `docs/method-tasks/M04_latrca.md` —— 含核心算法、curated 包索引、验证协议、期望结果。
 
 ## Curated 论文索引（复现核对原文）
-未提取（DOI 10.1109/TNSRE.2022.3162029）
+34_2022_huang_latrca
+包位置: `curated/papers/03-vep-algorithm/11-spatial-filter/34_2022_huang_latrca/`（已提取 ✅）
+
+> 若标注 10.1109/TNSRE.2022.3162029）
 （若标注"未提取"：先向主 agent 请求补提取，或直接从 Zotero/DOI 获取原文核对）
 
 ## 实现要求
@@ -26,13 +29,13 @@ IEEE TNSRE (2022), DOI 10.1109/TNSRE.2022.3162029
 - 协议: windows 0.2-1.0 s; 对照 TRCA/eTRCA/CCA
 - 预处理与 BL01 一致（cue 跳过 0.5s、潜伏期 0.14s、notch 50Hz、filterbank）
 
-## 期望结果与验收
-1. 结果写入 `tasks/methods/M04_latrca/results/`（trials.csv + summary.csv + figures）
-2. 与规格文档"期望结果"的论文数字 diff ≤ 2%（acc）
-3. 汇报：实现文件、注册方式、Benchmark/BETA 各窗口 acc/ITR 表、与论文对比结论
-4. 更新 `docs/method-tasks/README.md` 状态列 → 已完成
+## 期望结果（论文 Table，curated 包 34 提取）
+- 统计表：TRCA vs LA-TRCA 在 Dataset I（0.2-1.4s）和 Benchmark（0.2-1.0s）各窗口的显著性（p 值多 <0.05 或 <0.0001）
+- 刺激布局：4×3（垂直间距 100px，水平 500px）/ 3×4 / 2×6 对比
+- 验收：Benchmark 上 LA-TRCA ≥ TRCA（各窗口 acc 对比曲线），差异显著性方向一致
 
-## 环境
-- Python: `D:\ProjData\proj_pythonep_arena\.venv\Scripts\python.exe`
-- 数据集: `D:/ProjData/datasets`（local_paths.json 已配置）
-- 运行示例: `.venv\Scripts\python.exe tasks/methods/M04_latrca/run.py --workers 2 --resume`
+## 验收流程（原）
+1. 结果写入 `tasks/methods/M04_latrca/results/`
+2. 与规格文档期望数字 diff ≤ 2%
+3. 汇报实现/注册/结果表/对比结论
+4. 更新 docs/method-tasks/README.md

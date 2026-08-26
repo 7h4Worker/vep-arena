@@ -10,7 +10,10 @@ Measurement (2024), DOI 10.1016/j.measurement.2024.114959
 见 `docs/method-tasks/M03_strca.md` —— 含核心算法、curated 包索引、验证协议、期望结果。
 
 ## Curated 论文索引（复现核对原文）
-未提取（DOI 10.1016/j.measurement.2024.114959）
+33_2024_yin_strca
+包位置: `curated/papers/03-vep-algorithm/11-spatial-filter/33_2024_yin_strca/`（已提取 ✅）
+
+> 若标注 10.1016/j.measurement.2024.114959）
 （若标注"未提取"：先向主 agent 请求补提取，或直接从 Zotero/DOI 获取原文核对）
 
 ## 实现要求
@@ -26,13 +29,16 @@ Measurement (2024), DOI 10.1016/j.measurement.2024.114959
 - 协议: 多校准块 1-4; 与 TRCA/scTRCA 对比
 - 预处理与 BL01 一致（cue 跳过 0.5s、潜伏期 0.14s、notch 50Hz、filterbank）
 
-## 期望结果与验收
-1. 结果写入 `tasks/methods/M03_strca/results/`（trials.csv + summary.csv + figures）
-2. 与规格文档"期望结果"的论文数字 diff ≤ 2%（acc）
-3. 汇报：实现文件、注册方式、Benchmark/BETA 各窗口 acc/ITR 表、与论文对比结论
-4. 更新 `docs/method-tasks/README.md` 状态列 → 已完成
+## 期望结果（论文 Table，curated 包 33 提取）
+ITR (bits/min) @ 窗口，随训练试次数变化：
+| 方法 | 2 trials | 3 | 4 | 5 | BETA 2 | BETA 3 |
+|---|---|---|---|---|---|---|
+| scTRCA | 162.77@1.0s | 175.35@0.9s | 182.72@0.9s | 188.47@0.8s | 107.09@1.1s | 121.44@1.0s |
+| stTRCA | 170.44@0.9s | 185.97@0.8s | 193.59@0.8s | 200.95@0.7s | 111.08@1.1s | 130.55@0.9s |
+验收：复现 ITR 与上表 diff ≤ 2%
 
-## 环境
-- Python: `D:\ProjData\proj_pythonep_arena\.venv\Scripts\python.exe`
-- 数据集: `D:/ProjData/datasets`（local_paths.json 已配置）
-- 运行示例: `.venv\Scripts\python.exe tasks/methods/M03_strca/run.py --workers 2 --resume`
+## 验收流程（原）
+1. 结果写入 `tasks/methods/M03_strca/results/`
+2. 与规格文档期望数字 diff ≤ 2%
+3. 汇报实现/注册/结果表/对比结论
+4. 更新 docs/method-tasks/README.md

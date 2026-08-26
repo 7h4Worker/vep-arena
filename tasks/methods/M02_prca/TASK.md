@@ -26,13 +26,17 @@ Ke Y, Liu S, Ming D, IEEE TBME 71(4) (2024), DOI 10.1109/TBME.2023.3333435
 - 协议: 核心=1 block 校准（每目标 1 trial）; 对照 2/3/4 blocks; windows 0.5-1.0 s
 - 预处理与 BL01 一致（cue 跳过 0.5s、潜伏期 0.14s、notch 50Hz、filterbank）
 
-## 期望结果与验收
-1. 结果写入 `tasks/methods/M02_prca/results/`（trials.csv + summary.csv + figures）
-2. 与规格文档"期望结果"的论文数字 diff ≤ 2%（acc）
-3. 汇报：实现文件、注册方式、Benchmark/BETA 各窗口 acc/ITR 表、与论文对比结论
-4. 更新 `docs/method-tasks/README.md` 状态列 → 已完成
+## 期望结果（论文 Table，curated 包 19 提取）
+ITR (bits/min)：
+| 方法 | Dataset I (T_test) | ITR | Dataset II (T_test) | ITR |
+|---|---|---|---|---|
+| eCCA | 0.5 s | 161.3±67.7 | 0.9 s | 163.3±56.2 |
+| ePRCA (T_train=T_test) | 0.5 s | 176.8±60.3 | 0.9 s | 176.9±50.0 |
+在线被试 acc/ITR（节选）：S1 97.50%/149.35、S2 91.25%/129.20、S3 72.50%/83.08
+验收：Benchmark 1-block acc/ITR 与论文 diff ≤ 2%
 
-## 环境
-- Python: `D:\ProjData\proj_pythonep_arena\.venv\Scripts\python.exe`
-- 数据集: `D:/ProjData/datasets`（local_paths.json 已配置）
-- 运行示例: `.venv\Scripts\python.exe tasks/methods/M02_prca/run.py --workers 2 --resume`
+## 验收流程（原）
+1. 结果写入 `tasks/methods/M02_prca/results/`
+2. 与规格文档期望数字 diff ≤ 2%
+3. 汇报实现/注册/结果表/对比结论
+4. 更新 docs/method-tasks/README.md
