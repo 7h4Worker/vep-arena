@@ -310,8 +310,16 @@ def prepare_run(manifest: dict, args, project: Path, result_dir: Path, *, classe
         inventory = json.loads(Path(source_path).read_text(encoding="utf-8"))
         source_fields = verify_sources(Path(root), inventory)
         source_fields["source_inventory"] = inventory
+    code = provenance(project)
+    if (source_path is not None or getattr(args, "resume", False)) and (
+        not code.get("git_commit") or code.get("dirty") is not False
+    ):
+        raise ValueError(
+            "Verified or resumable runs require Git provenance from an identified clean commit; "
+            "Git provenance is unavailable or the worktree is dirty"
+        )
     manifest.update({"run_id": uuid.uuid4().hex, "methods": methods, "classes": classes,
-                     "resolved_config": json_value(vars(args)), "code": provenance(project),
+                     "resolved_config": json_value(vars(args)), "code": code,
                      "label_base": 0, **source_fields})
     manifest["splits"] = [
         {"split_id": f"subject-{subject}-test-{block}", "subject": subject,

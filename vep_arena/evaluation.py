@@ -221,7 +221,7 @@ def load_existing_rows(result_dir: Path, expected_manifest: dict | None = None):
     saved = json.loads(manifest_path.read_text(encoding="utf-8"))
     require_same_run(saved, expected_manifest)
     verify_files(result_dir, saved)
-    frames = [pd.read_csv(path) for path in paths]
+    frames = [pd.read_csv(path, float_precision="round_trip") for path in paths]
     validate_predictions(frames[0], frames[1], saved.get("classes"))
     validate_coverage(frames[0], expected_manifest, complete=False)
     # Legacy runners checkpoint entire windows. A partly written window is not
@@ -280,7 +280,7 @@ def write_outputs(result_dir: Path, run_dir: Path | None, trial_rows: list[dict]
         stage = Path(directory)
         for name, frame in [("trials", trials), ("predictions", preds), ("runtime", runtime),
                             ("summary", summary), ("subject", subject), ("block", block)]:
-            frame.to_csv(stage / f"{name}.csv", index=False)
+            frame.to_csv(stage / f"{name}.csv", index=False, float_format="%.17g")
         (stage / "confusions").mkdir()
         for (method, window), rows in preds.groupby(["method", "window"]):
             relative = f"confusions/confusion_{method.lower()}_w{float(window)!r}.npy"

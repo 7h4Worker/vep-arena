@@ -8,6 +8,8 @@ import pandas as pd
 import pytest
 from vep_arena import evaluation as ev
 from vep_arena.config import BenchmarkSpec, CACHE_ROOT, PROJECT_ROOT, RESULT_ROOT, RUN_ROOT
+from vep_arena.data.epochs import CanonicalEpochStore, EpochRequest, MAX_SAFE_CACHE_PATH
+from vep_arena.data.presets import benchmark_64ch_default
 from vep_arena.run_contract import (atomic_json, audit_run, file_sha256, fingerprint,
     prepare_run, require_same_run, validate_predictions, source_inventory, verify_sources)
 
@@ -158,6 +160,21 @@ def test_resume_matching_config(tmp_path, monkeypatch):
     assert len(request["execution_history"]) == 1
 
 
+def test_resume_preserves_prediction_bytes(tmp_path, monkeypatch):
+    monkeypatch.setattr(ev, "plot_outputs", lambda *args: None)
+    trial, pred = rows()
+    pred[0]["score"] = -0.16281963972978084
+    pred[1]["score"] = 0.9802449074851853
+    settings = manifest()
+    ev.write_outputs(tmp_path, None, trial, pred, [], settings, BenchmarkSpec(classes=2), True)
+    before = (tmp_path / "predictions.csv").read_bytes()
+    request = manifest()
+    request["resolved_config"]["resume"] = True
+    loaded = ev.load_existing_rows(tmp_path, request)
+    ev.write_outputs(tmp_path, None, *loaded, request, BenchmarkSpec(classes=2), True)
+    assert (tmp_path / "predictions.csv").read_bytes() == before
+
+
 @pytest.mark.parametrize("field,value", [("subjects", [3, 4]), ("windows", [0.5, 1.0]), ("channels", "3ch")])
 def test_resume_changed_scope_rejected(tmp_path, monkeypatch, field, value):
     write_fixture(tmp_path, monkeypatch)
@@ -241,6 +258,48 @@ def test_prepare_refuses_overwrite(tmp_path):
     (tmp_path / "old.csv").write_text("old\n")
     with pytest.raises(FileExistsError):
         prepare_run(manifest(), argparse.Namespace(resume=False), tmp_path, tmp_path, classes=2)
+
+
+@pytest.mark.parametrize("code", [
+    {"git_commit": None, "dirty": None},
+    {"git_commit": "fixture", "dirty": True},
+])
+def test_verified_run_requires_clean_git_provenance(tmp_path, monkeypatch, code):
+    import vep_arena.run_contract as rc
+    monkeypatch.setattr(rc, "provenance", lambda project: code)
+    source = tmp_path / "raw"
+    source.mkdir()
+    (source / "fixture.mat").write_bytes(b"fixture")
+    inventory_path = tmp_path / "sources.json"
+    atomic_json(inventory_path, source_inventory(source, ["fixture.mat"]))
+    args = argparse.Namespace(
+        data_root=source,
+        source_manifest=inventory_path,
+        resume=False,
+    )
+    with pytest.raises(ValueError, match="Git provenance"):
+        prepare_run(manifest(), args, tmp_path, tmp_path / "out", classes=2)
+
+
+def test_long_epoch_cache_path_uses_compact_deterministic_name(tmp_path):
+    root = tmp_path / ("long-cache-root-" + "x" * 40)
+    request = EpochRequest(
+        preset=benchmark_64ch_default(tmp_path / "data"),
+        subject=1,
+        window=0.5,
+        kind="filterbank",
+        n_fbs=5,
+    )
+    store = CanonicalEpochStore(root)
+    path = store.path_for(request)
+    assert path == store.path_for(request)
+    assert len(str(store.manifest_path_for(request).absolute())) < MAX_SAFE_CACHE_PATH
+    assert path.name.startswith("s01_w0.5_filterbank_")
+    changed = EpochRequest(**{**request.__dict__, "window": 1.0})
+    assert store.path_for(changed) != path
+    sliced = EpochRequest(**{**request.__dict__, "window": 0.25, "cache_window": 0.5})
+    cached = EpochRequest(**{**request.__dict__, "cache_window": 0.5})
+    assert store.path_for(sliced) == store.path_for(cached)
 
 
 def test_valid_classification_audit(tmp_path, monkeypatch):
