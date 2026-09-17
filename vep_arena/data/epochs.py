@@ -11,7 +11,7 @@ from pathlib import Path
 
 import numpy as np
 
-from vep_arena.config import PROJECT_ROOT
+from vep_arena.config import CACHE_ROOT
 from vep_arena.data.benchmark import load_subject_filterbank, load_subject_toolbox_raw
 from vep_arena.data.presets import DatasetPreset
 
@@ -69,7 +69,7 @@ class CanonicalEpochStore:
     """Cache and retrieve dataset-preset-aligned epoch tensors."""
 
     def __init__(self, root: Path | None = None) -> None:
-        self.root = root or PROJECT_ROOT / "runs" / "canonical_epochs"
+        self.root = root or CACHE_ROOT / "canonical_epochs"
 
     def path_for(self, request: EpochRequest) -> Path:
         channels = channel_slug(request.preset.channels)

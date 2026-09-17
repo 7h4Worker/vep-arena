@@ -3,6 +3,8 @@
 *.egg-info/
 .env
 .env.*
+README_zh.md
+notes/
 
 # Python caches
 __pycache__/
@@ -12,8 +14,8 @@ __pycache__/
 .ruff_cache/
 
 # Arena generated artifacts
-results/
-runs/
+.cache/
+_archive/
 outputs/
 成果汇总/
 tasks/**/results/**
@@ -71,3 +73,6 @@ docs/paper_notes/**/page_*.txt
 Thumbs.db
 .vscode/
 .idea/
+
+# Runtime caches inside task dirs (regenerable; keep history clean)
+tasks/**/cache/
