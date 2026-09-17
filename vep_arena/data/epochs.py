@@ -11,13 +11,14 @@ from pathlib import Path
 
 import numpy as np
 
-from vep_arena.config import PROJECT_ROOT
+from vep_arena.config import CACHE_ROOT
 from vep_arena.data.benchmark import load_subject_filterbank, load_subject_toolbox_raw
 from vep_arena.data.presets import DatasetPreset
 
 
 FILTERBANK_VERSION = "ssvep_analysis_toolbox_benchmark_8k"
 RAW_VERSION = "ssvep_analysis_toolbox_notch_latency_crop"
+MAX_SAFE_CACHE_PATH = 240
 
 
 def channel_slug(channels: tuple[int, ...]) -> str:
@@ -69,7 +70,7 @@ class CanonicalEpochStore:
     """Cache and retrieve dataset-preset-aligned epoch tensors."""
 
     def __init__(self, root: Path | None = None) -> None:
-        self.root = root or PROJECT_ROOT / "runs" / "canonical_epochs"
+        self.root = root or CACHE_ROOT / "canonical_epochs"
 
     def path_for(self, request: EpochRequest) -> Path:
         channels = channel_slug(request.preset.channels)
@@ -84,7 +85,24 @@ class CanonicalEpochStore:
             f"_extra{request.extra_samples}"
             f"_ch{channels}.npz"
         )
-        return self.root / request.preset.name / name
+        path = self.root / request.preset.name / name
+        manifest_path = path.with_suffix(".manifest.json").absolute()
+        if len(str(manifest_path)) >= MAX_SAFE_CACHE_PATH:
+            cache_manifest = request.manifest()
+            cache_manifest.pop("window")
+            cache_manifest.pop("samples")
+            payload = json.dumps(
+                cache_manifest, sort_keys=True, separators=(",", ":"), ensure_ascii=True
+            ).encode("utf-8")
+            digest = hashlib.sha256(payload).hexdigest()[:16]
+            name = (
+                f"s{request.subject:02d}"
+                f"_w{cache_window:g}"
+                f"_{request.kind}"
+                f"_{digest}.npz"
+            )
+            path = self.root / request.preset.name / name
+        return path
 
     def manifest_path_for(self, request: EpochRequest) -> Path:
         return self.path_for(request).with_suffix(".manifest.json")

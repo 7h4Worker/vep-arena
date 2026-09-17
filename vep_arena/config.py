@@ -10,6 +10,9 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_ROOT = Path("D:/ProjData/datasets/ssvep_benchmark")
+CACHE_ROOT = PROJECT_ROOT / ".cache"
+# Compatibility paths for existing public runners and DNN entry points.
+# New task-owned results do not require moving historical outputs.
 RESULT_ROOT = PROJECT_ROOT / "results" / "benchmark_9ch"
 RUN_ROOT = PROJECT_ROOT / "runs"
 

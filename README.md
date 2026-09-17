@@ -4,6 +4,12 @@ Reproducible evaluation workspace for visual evoked potential (VEP) brain–comp
 Covers SSVEP and cVEP paradigms across multiple public and private datasets, with both
 traditional spatial-filtering methods and DNN baselines.
 
+## 项目地图与接入流程
+
+按三层推进：**数据底座 → 方法与评估核心 → 具体 task**。独立分析 task 可以直接复用数据，不必套用分类流程；模型代码存在也不等于完成接入。
+
+先读 [三层职责与稳定边界](docs/architecture.md)，新增数据/方法/分析按 [固定接入与验收回环](docs/integration_workflow_zh.md) 执行，来源与输出遵守 [产物契约](docs/result_artifact_contract.md)。这些文档不要求立即搬目录；接入验收以输入/输出对应、流程完整和证据可追溯为准，不以准确率高低为准。
+
 ## Library — `vep_arena/`
 
 ```text
@@ -15,6 +21,8 @@ vep_arena/
 │                    TRCA · TDCA · Multi-Stimulus
 │                    bPRCA · bTRCA · FusionCA (binocular)
 │                    SA-MVMD-TRCA · MVMD
+│                    RESS · PRCA · sTRCA · LA-TRCA · MOHP
+│                    Sinusoidal-Referenced TRCA · xTRCA · gTRCA · scTRCA
 ├── nn/            DNN models — EEGNet, SSVEPformer, TRCANet
 ├── signal/        Filters (comb, notch), SNR, PLV, spectrum utilities
 ├── channel/       Discrete channel capacity, confusion-matrix tools
@@ -39,17 +47,21 @@ HD-200, Dual-Frequency (Liang 2020 / Sun 2024), MFSC-160,
 Broadband White-Noise cVEP, EMBC-9 / JBHI-16 / JBHI-35 binocular datasets,
 and more.
 
+Public method reproductions live under `tasks/methods/M01_ress` through
+`tasks/methods/M09_sctrca`. Each directory provides a runnable benchmark entry
+point while generated results remain ignored.
+
 ## Quick Start
 
 ```bash
 # install (requires uv)
 uv sync --extra all
 
-# run a baseline evaluation
-uv run python tasks/ssvep_jbhi_35target_baselines/run.py
+# inspect a public method runner
+uv run python tasks/methods/M01_ress/run.py --help
 
 # run tests
-uv run pytest tests/
+uv run --with pytest python -m pytest tests/
 ```
 
 ## Data
@@ -71,7 +83,7 @@ Public datasets used:
 
 ## Environment
 
-Requires Python 3.10+ and [uv](https://docs.astral.sh/uv/) for dependency management.
+Requires Python 3.11 or 3.12 and [uv](https://docs.astral.sh/uv/) for dependency management.
 GPU support: PyTorch with CUDA (optional, for DNN models).
 
 ## License
