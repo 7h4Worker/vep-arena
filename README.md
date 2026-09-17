@@ -4,6 +4,12 @@ Reproducible evaluation workspace for visual evoked potential (VEP) brain–comp
 Covers SSVEP and cVEP paradigms across multiple public and private datasets, with both
 traditional spatial-filtering methods and DNN baselines.
 
+## 项目地图与接入流程
+
+按三层推进：**数据底座 → 方法与评估核心 → 具体 task**。独立分析 task 可以直接复用数据，不必套用分类流程；模型代码存在也不等于完成接入。
+
+先读 [三层职责与稳定边界](docs/architecture.md)，新增数据/方法/分析按 [固定接入与验收回环](docs/integration_workflow_zh.md) 执行，来源与输出遵守 [产物契约](docs/result_artifact_contract.md)。这些文档不要求立即搬目录；接入验收以输入/输出对应、流程完整和证据可追溯为准，不以准确率高低为准。
+
 ## Library — `vep_arena/`
 
 ```text

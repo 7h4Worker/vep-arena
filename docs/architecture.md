@@ -1,128 +1,108 @@
-# VEP Arena Architecture
+# VEP Arena：三层职责与稳定边界
 
-VEP Arena should stay readable first. Advanced options can exist, but the main
-path should be easy:
+更新：2026-09-17。本文是当前工程职责的主入口；不是要求立即搬目录的重构方案。
 
-```text
-choose dataset -> choose protocol -> choose methods -> run -> read results
-```
+## 目标与非目标
 
-## Layers
+主线是 **SSVEP 数据组织 → 方法验证 → 同条件评估与比较**。以后需要在线回放时，扩展执行方式与时间约束，不另建一套平台。
 
-### Data
+不追求通用 EEG 大平台，不要求所有分析继承同一个 runner，也不以准确率高低定义“接入完成”。先固定可复用边界、格式和验收回环，再把精力投入方法接入和实验问题。
 
-Dataset loaders expose metadata and trial tensors. They should not know about a
-specific algorithm.
+## 只按三层推进
 
-Current dataset:
+| 层 | 负责什么 | 稳定边界 | 当前代码位置 |
+| --- | --- | --- | --- |
+| 一层：数据底座 | 原始文件、数据事实、标签/刺激映射、试次身份、裁窗与可复用信号操作 | 同一请求返回含义一致、可追溯的样本；不决定算法或研究结论 | `vep_arena/data/`、通用 `signal/` 操作 |
+| 二层：方法与评估核心 | 完整方法、协议划分、训练/预测、产物记录、完整性检查、通用比较 | 同一协议下按相同信息权限执行；输出可重建、可对齐 | `methods/`、`nn/`、`evaluation.py`、`metrics.py` 及共享分析工具 |
+| 三层：具体 task | 论文复现、标准对比、消融、独立专题分析、在线回放实验 | 声明问题、输入、参数和产出；保留本问题独有逻辑 | 现有 `tasks/`，未迁移入口暂留 `scripts/` |
 
-- Tsinghua Benchmark SSVEP
-- 35 subjects
-- 6 blocks
-- 40 targets
-- 250 Hz
-- 9-channel occipital/parietal subset
-
-### Preprocessing
-
-Preprocessing must be named and recorded in the output. This matters because
-neural networks and spatial-filter methods often use different filtering.
-
-Examples:
-
-- `dnn_filterbank`
-- `ssvepformer_bandpass`
-- `fbtrca_filterbank`
-- `notch50_benchmark_filterbank`
-
-### Protocol
-
-Protocols define train/test splits and evaluation scope.
-
-Current protocol:
-
-- subject-specific
-- leave-one-block-out
-- windows: 0.2 to 1.0 s
-- subject/block/window level outputs
-
-Future protocols:
-
-- cross-subject
-- calibration-size sweep
-- cross-dataset transfer
-- online simulation
-- session drift or time-order split
-
-### Methods
-
-Each method should expose a small adapter:
+这三层是职责，不是三次阶段性重构，也不是必须新增三个目录。
 
 ```text
-fit(train, context)
-predict(test, context)
-save(path)
-load(path)
-predict_online(window, context)
+三层 task（选择问题与配置）
+   ├── 调用二层：方法 / 评估 / 通用比较
+   │                └── 调用一层：数据与基础操作
+   └── 可以直接调用一层，完成独立信号或数据分析
+
+代码 + 原始数据索引 + 实际参数 → 中间处理 → 运行产物 → 派生分析
 ```
 
-Method-specific complexity stays inside the adapter. For example, neural
-network methods can manage device, epochs, checkpoints, seeds, and logs without
-forcing conventional spatial filters to care about those details.
+依赖朝下。`vep_arena/` 不反向导入 `tasks/` 或 `scripts/`。同用一份数据，不意味着必须同用一套分析逻辑。
 
-### Evaluation
+## 一层：已有数据接口优先，不重新发明
 
-The evaluator consumes standardized trial rows:
+沿用 [`DatasetInfo`、`TrialBatch`、`SSVEPDataset`](../vep_arena/data/interface.py)。标准 SSVEP 分类批次为 `trials × bands × channels × samples`，`y` 为零基目标标签；频率、相位、通道顺序等含义必须随数据说明。
 
-```text
-method, dataset, protocol, subject, block, window, accuracy, itr, samples
-```
+已有 loader / epoch store 的内部轴顺序可以保留，通过明确适配进入公共边界；不要为了目录统一重写数据读取。缺少的逐试次身份和来源信息可先由旁路表补齐，不强制马上更换 Python 类型。
 
-From that, reports can derive:
+原始 `.mat`、`.h5` 等文件保持原格式，不强制转换全部数据。对不适用频率表、规则 block 或分类标签的分析，不伪造字段：声明能力与缺失原因，保留原始事件/序列含义。
 
-- group mean
-- subject standard deviation
-- SEM
-- within-subject block standard deviation
-- paired statistical tests
-- curves and compact tables
+一层固定的是数据含义、样本身份、选择规则和错误行为，不是每种数据文件必须同构。接入回环见 [接入与验收流程](integration_workflow_zh.md)。
 
-### Analysis Tools
+## 二层：统一边界，允许方法内部不同
 
-These should be optional modules, not part of the core training loop:
+二层只有三类责任，不再把它们扩成新的管理层级：
 
-- MNE preprocessing and spectral diagnostics
-- SNR and phase analysis
-- feature embedding export
-- t-SNE or UMAP plots
-- confusion matrices
-- model calibration and deployment checks
+- **方法**：算法/网络结构、方法专属变换、拟合与预测。网络 `forward()` 不等于完整方法接入；EEGNet 等还需要训练与输入适配。传统方法不必依赖 PyTorch。
+- **执行**：task 选择协议；共享代码形成训练/验证/测试身份，调用方法并记录产物。已有接口不一致时加薄适配，不要求全部方法同时换签名。
+- **比较**：检查测试样本与资源条件、对齐、聚合、统计、公共绘图；实验要比较什么及如何解释仍由 task 决定。
 
-## Output Policy
+固定原则：测试标签不参与拟合、调参或选 checkpoint；学习得到的预处理参数只用协议允许的数据拟合；各 fold 的状态隔离。固定无学习参数的变换仍需记录顺序和可用时间范围。
 
-Use short names for clean outputs:
+`fit` 可以是无监督、监督或无状态适配；不能为了接口一致给本来无需训练的方法编造训练步骤。预测标签必需；分数、概率、保存加载、在线状态等能力显式声明，未提供的能力不能被消费端假设存在。
 
-```text
-results/benchmark_9ch/report.md
-results/benchmark_9ch/summary.csv
-results/benchmark_9ch/subject.csv
-results/benchmark_9ch/block.csv
-results/benchmark_9ch/stats.csv
-results/benchmark_9ch/figures/accuracy.svg
-```
+预处理允许方法特异，遵守 [现有预处理契约](preprocessing_contracts_zh.md)。比较时区分：
 
-Raw logs and checkpoints go under `runs/`.
+| 比较目的 | 口径 |
+| --- | --- |
+| 各自论文复现 | 按各自参考设置验证；不自动合成公平横向排名 |
+| Arena 管线比较 | 相同测试试次、划分语义、数据权限、校准预算、时间/指标口径；方法内变换可不同但必须披露 |
+| 控制变量/算法消融 | 在管线比较条件上进一步固定声明的其他因素，例如相同预处理 |
 
-## Current Caveats
+使用外部预训练或跨被试数据的模型必须声明来源与允许范围。资源不相同可以分组研究，但不能隐藏差异。独立分析也可以研究不可直接比较的结果，只能使用与该分析相称的结论。
 
-The current DNN, SSVEPFormer, and FBTRCA entries are imported from previous
-project runs. Their protocols are aligned at the Benchmark 9ch leave-one-block
-level, but their preprocessing and training procedures are method-specific.
-That is acceptable for the first arena report, but the preprocessing ledger
-must stay explicit.
+## 三层：独立问题留在 task
 
-TDCA is the first method implemented directly in VEP Arena. It follows the
-paper's Benchmark settings: 5 filter banks, 5 harmonics, 8 components, and
-5 temporal delays. For training, the loader keeps the extra post-window samples
-needed by TDCA's delayed copies; prediction pads delayed samples with zeros so
-the test decision does not use samples beyond the requested window.
+一个 task 可以只用数据底座，研究频谱、误差结构或某个特殊统计问题；它可以有自己的步骤、数据结构、算法组合和图表。无需先把这些逻辑抽到核心，也不强制输出 accuracy 或 `predictions.csv`。
+
+每个 task 的 README 只需明确：问题；输入数据/结果版本；实际入口和配置；产物类型；可执行校验及已验证范围。分类任务用分类产物契约，纯分析任务用分析产物契约。
+
+| 改动 | 归属 |
+| --- | --- |
+| 新文件格式、标签映射、采样率和裁窗修正 | 一层 adapter 及数据测试 |
+| 新网络、空间滤波器、方法专属训练 | 二层方法及方法测试 |
+| 续跑、划分隔离、样本对齐、统一写出 | 二层共享执行/产物及回归测试 |
+| 通道组合、窗口扫描、某论文参数表 | 三层 task 的配置和说明 |
+| 特殊误差分析或特定图表 | 三层 task；成熟的通用算子才提取 |
+| 两组结果的兼容性检查 | 二层共享比较；比较名单和解释留三层 |
+
+“原子操作”只是函数/算子的粒度，不是第四层，也不需要单独 task。已稳定的通用滤波或统计函数留在所属模块，不建立杂项 `utils` 大仓库。
+
+## 减少返工的变更规则
+
+1. **固定公共含义，不冻结实现。** 新数据加 adapter，新算法加方法适配，新实验加 task/配置；默认不改已有目录和输出文件名。
+2. **先局部接通，再按需提取。** 一个专题独有的逻辑留 task；多个调用方确实共享相同语义并有测试时再提取。共享正确性缺陷直接在共享层修，不复制补丁到每个 task。
+3. **兼容优先。** 新字段尽量可选、旧结果可经旁路说明读取。更改标签含义、轴顺序或字段语义才需要版本和迁移说明；不静默覆盖旧结果。
+4. **不先建设未用能力。** 不为 EEGNet 接入预建通用插件系统、工作流服务或所有在线协议；不强迫所有已有实验先补齐新规范才允许增加特性。
+5. **改动有影响范围。** 写清影响哪些数据版本、方法和 task，只重跑受影响的回归；纯图表变化不重训。
+
+原有脚本逐条适配，旧入口可暂做兼容包装。一次迁移以小样本输出核对为终点，不以“所有文件都搬完”为终点。
+
+## 当前落地边界与下一条工作线
+
+已存在：数据接口与 loader、模型/传统方法模块、预处理说明、分类产物规范和部分评估工具。协议执行、写出和比较仍有分散在 runner 的部分；本文不声称统一执行器或自动验收器已经实现。
+
+接下来的交付以一条纵向路径为单位：复用已有 EEGNetMini 与 TRCA 代码，在声明的数据子集、一个外层测试划分和一个窗口上，接通数据 → 实际训练/预测 → 产物核对 → 同条件比较。此处是工程集成验证，不是论文复现成功声明。
+
+随后复用同一回环接入已有 DNN、SSVEPFormer、TRCANet；分别登记已验证的协议，不重新迁移网络定义。现有结果有来源则保留，没有证据则标未验证，不为了状态好看重复或虚构全量实验。
+
+在线回放以后作为二层执行扩展和三层 task 加入：只使用决策时已可见样本；声明因果性、look-ahead、缓存/滤波范围、时钟与延迟。离线零相位滤波的短窗结果不直接宣称实时可用。设备采集和刺激控制不是本轮前置任务。
+
+## 文档分工
+
+- 本文：三层归属与稳定边界，避免重复讨论目录。
+- [接入与验收流程](integration_workflow_zh.md)：增加数据、方法、task 时循环执行的检查与完成标准。
+- [产物契约](result_artifact_contract.md)：代码、数据、参数、产物的对应格式。
+- [预处理契约](preprocessing_contracts_zh.md)：具体滤波、裁窗和输入变换的命名与含义。
+
+文档规定的是工程目标。某个实现是否达到目标，以带版本和范围的验收记录为准。
