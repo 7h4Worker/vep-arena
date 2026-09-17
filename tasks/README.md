@@ -3,19 +3,12 @@
 Tasks are concrete research or validation questions. A task owns its runnable
 entry points, notes, and generated results.
 
-Current task root layout:
+Public task layout:
 
 ```text
 tasks/
-  benchmark_decision_channel_capacity/
-  benchmark_signal_channel_analysis/
-  beta_ssvep_9ch_baselines/
-  beta_ssvep_9ch_official_grid/
-  cvep_nbrs_jfpm_tsinghua_2024_baselines/
-  ssvep_binocular_ar_trca/
-  ssvep_binocular_dataset_smoke/
-  ssvep_benchmark_9ch_feature_analysis/
-  ssvep_hd_200target_tdca_sample/
+  methods/          public method reproductions and benchmark runners
+  <dataset>_<scope>_<purpose>/
   _legacy/
 ```
 
@@ -46,6 +39,8 @@ Naming convention:
   default to prevent accidental commits of predictions, caches, and large logs.
 
 Large datasets and external toolboxes stay outside the repository.
+
+The consolidated method runners are indexed in [`methods/README.md`](methods/README.md).
 
 ## Cleanup convention
 

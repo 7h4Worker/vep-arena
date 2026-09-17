@@ -15,6 +15,8 @@ vep_arena/
 │                    TRCA · TDCA · Multi-Stimulus
 │                    bPRCA · bTRCA · FusionCA (binocular)
 │                    SA-MVMD-TRCA · MVMD
+│                    RESS · PRCA · sTRCA · LA-TRCA · MOHP
+│                    Sinusoidal-Referenced TRCA · xTRCA · gTRCA · scTRCA
 ├── nn/            DNN models — EEGNet, SSVEPformer, TRCANet
 ├── signal/        Filters (comb, notch), SNR, PLV, spectrum utilities
 ├── channel/       Discrete channel capacity, confusion-matrix tools
@@ -39,17 +41,21 @@ HD-200, Dual-Frequency (Liang 2020 / Sun 2024), MFSC-160,
 Broadband White-Noise cVEP, EMBC-9 / JBHI-16 / JBHI-35 binocular datasets,
 and more.
 
+Public method reproductions live under `tasks/methods/M01_ress` through
+`tasks/methods/M09_sctrca`. Each directory provides a runnable benchmark entry
+point while generated results remain ignored.
+
 ## Quick Start
 
 ```bash
 # install (requires uv)
 uv sync --extra all
 
-# run a baseline evaluation
-uv run python tasks/ssvep_jbhi_35target_baselines/run.py
+# inspect a public method runner
+uv run python tasks/methods/M01_ress/run.py --help
 
 # run tests
-uv run pytest tests/
+uv run --with pytest python -m pytest tests/
 ```
 
 ## Data
@@ -71,7 +77,7 @@ Public datasets used:
 
 ## Environment
 
-Requires Python 3.10+ and [uv](https://docs.astral.sh/uv/) for dependency management.
+Requires Python 3.11 or 3.12 and [uv](https://docs.astral.sh/uv/) for dependency management.
 GPU support: PyTorch with CUDA (optional, for DNN models).
 
 ## License
